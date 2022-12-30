@@ -1,0 +1,180 @@
+description: |-
+  example
+
+collect_time:
+  300
+
+keyframe_time:
+  0.5
+
+client:
+  init:
+    host: 127.0.0.1
+    port: 2000
+  time_out: 10.0
+
+world:
+  init:
+    fixed_delta_seconds: 0.05
+  weather_mode: "custom"
+  weather:
+    cloudiness: 0 # Values range from 0 to 100, being 0 a clear sky and 100 one completely covered with clouds.
+    precipitation: 0 # Rain intensity values range from 0 to 100, being 0 none at all and 100 a heavy rain.
+    precipitation_deposits: 0 # Determines the creation of puddles. Values range from 0 to 100, being 0 none at all and 100 a road completely capped with water. Puddles are created with static noise, meaning that they will always appear at the same locations.
+    wind_intensity: 0 # Controls the strength of the wind with values from 0, no wind at all, to 100, a strong wind. The wind does affect rain direction and leaves from trees, so this value is restricted to avoid animation issues.
+    sun_azimuth_angle: 0 # The azimuth angle of the sun. Values range from 0 to 360. Zero is an origin point in a sphere determined by Unreal Engine.
+    sun_altitude_angle: 90 # Altitude angle of the sun. Values range from -90 to 90 corresponding to midnight and midday each.
+    fog_density: 0 # Fog concentration or thickness. It only affects the RGB camera sensor. Values range from 0 to 100.
+    fog_distance: 0 # Fog start distance. Values range from 0 to infinite.
+    wetness: 0 # Wetness intensity. It only affects the RGB camera sensor. Values range from 0 to 100.
+    fog_falloff: 0 # Density of the fog (as in specific mass) from 0 to infinity. The bigger the value, the more dense and heavy it will be, and the fog will reach smaller heights. Corresponds to Fog Height Falloff in the UE docs.If the value is 0, the fog will be lighter than air, and will cover the whole scene.A value of 1 is approximately as dense as the air, and reaches normal-sized buildings.For values greater than 5, the air will be so dense that it will be compressed on ground level.
+    scattering_intensity: 0 # Controls how much the light will contribute to volumetric fog. When set to 0, there is no contribution.
+    mie_scattering_scale: 0 # Controls interaction of light with large particles like pollen or air pollution resulting in a hazy sky with halos around the light sources. When set to 0, there is no contribution.
+    rayleigh_scattering_scale: 0.0331 # Controls interaction of light with small particles like air molecules. Dependent on light wavelength, resulting in a blue sky in the day or red sky in the evening.
+    dust_storm: 0 # Determines the strength of the dust storm weather. Values range from 0 to 100.
+
+ego_vehicle:
+  init:
+    bp_name: "vehicle.tesla.model3"
+    location: 
+      x: -90.62303161621094
+      y: 16.47465705871582
+      z: 0.5999999642372131
+    rotation: 
+      yaw: 0.15919798612594604
+      pitch: 0.0
+      roll: 0.0
+    options: null
+    path: 
+      - 
+        x: -89.62303161621094
+        y: 16.47465705871582
+        z: 0.5999999642372131
+
+
+CameraRGBBaseOptions: &CameraRGBBaseOptions
+  "image_size_x": "1600"
+  "image_size_y": "900"
+  "sensor_tick": "0.0833333"
+  "fstop": "1.8"
+  "shutter_speed": "20.0"
+
+
+
+sensors:
+  - init: 
+      name: "CAM_FRONT"
+      bp_name: 'sensor.camera.rgb'
+      location: 
+        x: 1.70079118954
+        y: 0.0159456324149
+        z: 1.51095763913
+      rotation:
+        yaw: 0
+        pitch: 90
+        roll: -90
+      options: 
+          <<: *CameraRGBBaseOptions
+          "fov": "70"
+  - init: 
+      name: "CAM_FRONT_LEFT"
+      bp_name: 'sensor.camera.rgb'
+      location: 
+        x: 1.5508477543
+        y: -0.493404796419
+        z: 1.49574800619
+      rotation:
+        yaw: -55
+        pitch: 90
+        roll: -90
+      options: 
+          <<: *CameraRGBBaseOptions
+          "fov": "70"
+  - init: 
+      name: "CAM_BACK_LEFT"
+      bp_name: 'sensor.camera.rgb'
+      location: 
+        x: 1.0148780988
+        y: -0.480568219723
+        z: 1.56239545128
+      rotation:
+        yaw: -110
+        pitch: 90
+        roll: -90
+      options: 
+          <<: *CameraRGBBaseOptions
+          "fov": "70"
+  - init: 
+      name: "CAM_BACK"
+      bp_name: 'sensor.camera.rgb'
+      location: 
+        x: 0.0283260309358
+        y: 0.00345136761476
+        z: 1.57910346144
+      rotation:
+        yaw: -180
+        pitch: 90
+        roll: -90
+      options: 
+          <<: *CameraRGBBaseOptions
+          "fov": "110"
+  - init: 
+      name: "CAM_BACK_RIGHT"
+      bp_name: 'sensor.camera.rgb'
+      location: 
+        x: 0.0283260309358
+        y: 0.00345136761476
+        z: 1.57910346144
+      rotation:
+        yaw: 110
+        pitch: 90
+        roll: -90
+      options: 
+          <<: *CameraRGBBaseOptions
+          "fov": "70"
+  - init: 
+      name: "CAM_FRONT_RIGHT"
+      bp_name: 'sensor.camera.rgb'
+      location: 
+        x: 1.52387798135
+        y: 0.494631336551
+        z: 1.50932822144
+      rotation:
+        yaw: 55
+        pitch: 90
+        roll: -90
+      options: 
+          <<: *CameraRGBBaseOptions
+          "fov": "70"
+
+vehicles:
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -67.25457000732422
+        y: 27.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+walkers:
+  - init:
+      bp_name: "walker.pedestrian.0001"
+      location:
+          x: -200.25457000732422
+          y: 27.96375846862793
+          z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      destination:
+          x: -100.25457000732422
+          y: 27.96375846862793
+          z: 0.5999999642372131
