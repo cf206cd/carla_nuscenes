@@ -117,10 +117,12 @@ class CollectClient:
                 sensor.data_list.clear()
             for walker in self.walkers:
                 if(self.is_invisible(self.ego_vehicle,walker)):
-                    print("walker transform",walker.get_location())
+                    print("invisible walker location",walker.get_location())
+                    print("invisible walker bbox",[get_location(p) for p in walker.get_bbox()])
             for vehicle in self.vehicles:
                 if(self.is_invisible(self.ego_vehicle,vehicle)):
-                    print("vehicle transform",vehicle.get_location())
+                    print("invisible vehicle location",vehicle.get_location())
+                    print("invisible vehicle bbox",[get_location(p) for p in vehicle.get_bbox()])
 
     def destroy(self):
         if self.walkers is not None:

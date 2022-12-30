@@ -25,3 +25,6 @@ class Actor:
 
     def get_location(self):
         return self.actor.get_transform().transform(self.actor.bounding_box.location)
+
+    def get_bbox(self):
+        return self.actor.bounding_box.get_world_vertices(self.actor.get_transform())
