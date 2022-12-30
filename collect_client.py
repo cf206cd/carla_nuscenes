@@ -87,7 +87,7 @@ class CollectClient:
             walker.start()
 
         self.sensors = [Sensor(world=self.world, attach_to=self.ego_vehicle.get_actor(), **sensor_config["init"]) for sensor_config in self.config["sensors"]]
-        sensors_batch = [SpawnActor(sensor.blueprint,sensor.transform) for sensor in self.sensors]
+        sensors_batch = [SpawnActor(sensor.blueprint,sensor.transform,sensor.attach_to) for sensor in self.sensors]
         for i,response in enumerate(self.client.apply_batch_sync(sensors_batch)):
             if not response.error:
                 self.sensors[i].set_actor(response.actor_id)
@@ -111,6 +111,8 @@ class CollectClient:
         if count % int(self.config["keyframe_time"]/self.settings.fixed_delta_seconds) == 0:
             for sensor in self.sensors:
                 print("sensor_data:",len(sensor.get_data()))
+                if sensor.data_list:
+                    print("last data",get_location(sensor.get_last_data()[0]),sensor.get_last_data()[1])
                 sensor.data_list.clear()
             for walker in self.walkers:
                 if(self.is_invisible(self.ego_vehicle,walker)):

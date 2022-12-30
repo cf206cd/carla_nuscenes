@@ -48,7 +48,7 @@ class Sensor(Actor):
         return self.data_list[-1]
 
     def add_data(self,data):
-        self.data_list.append(data)
+        self.data_list.append((self.actor.parent.get_location(),data))
 
 
         
