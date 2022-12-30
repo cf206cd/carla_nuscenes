@@ -22,3 +22,6 @@ class Actor:
 
     def destroy(self):
         self.actor.destroy()
+
+    def get_location(self):
+        return self.actor.get_transform().transform(self.actor.bounding_box.location)

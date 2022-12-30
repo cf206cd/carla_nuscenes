@@ -50,12 +50,14 @@ class CollectClient:
         self.ego_vehicle = Vehicle(world=self.world,**self.config["ego_vehicle"]["init"])
         self.ego_vehicle.blueprint.set_attribute('role_name', 'hero')
         self.ego_vehicle.spawn_actor()
+        self.ego_vehicle.get_actor().set_autopilot()
 
         self.vehicles = [Vehicle(world=self.world,**vehicle_config["init"]) for vehicle_config in self.config["vehicles"]]
         vehicles_batch = [SpawnActor(vehicle.blueprint,vehicle.transform)
                             .then(SetAutopilot(FutureActor, True, self.trafficmanager.get_port())) 
                             for vehicle in self.vehicles]
         for i,response in enumerate(self.client.apply_batch_sync(vehicles_batch)):
+            print(i)
             if not response.error:
                 self.vehicles[i].set_actor(response.actor_id)
             else:
@@ -114,11 +116,11 @@ class CollectClient:
                 print("sensor_data:",len(sensor.get_data()))
                 sensor.data_list.clear()
             for walker in self.walkers:
-                if(self.is_visible(self.ego_vehicle,walker)):
-                    print(walker.get_actor().get_transform().location)
+                if(self.is_invisible(self.ego_vehicle,walker)):
+                    print("walker transform",walker.get_location())
             for vehicle in self.vehicles:
-                if(self.is_visible(self.ego_vehicle,vehicle)):
-                    print(vehicle.get_actor().get_transform().location)
+                if(self.is_invisible(self.ego_vehicle,vehicle)):
+                    print("vehicle transform",vehicle.get_location())
 
     def destroy(self):
         if self.walkers is not None:
@@ -140,8 +142,10 @@ class CollectClient:
         self.walkers = None
         self.world.apply_settings(self.original_settings)
 
-    def is_visible(self,ego,target):
-        print(get_location(ego.get_actor().get_transform().location),get_location(target.get_actor().get_transform().location))
-        points =  self.world.cast_ray(ego.get_actor().get_transform().location,target.get_actor().get_transform().location)
-        print([(get_location(point.location),point.label) for point in points])
-        return True
+    def is_invisible(self,ego,target):
+        ego_bbox_center = ego.get_location()
+        target_bbox_center = target.get_location()
+        points =  self.world.cast_ray(ego_bbox_center,target_bbox_center)
+        points = list(filter(lambda point:not ego.get_actor().bounding_box.contains(point.location,ego.get_actor().get_transform()) 
+                            and not target.get_actor().bounding_box.contains(point.location,target.get_actor().get_transform()),points))
+        return points
