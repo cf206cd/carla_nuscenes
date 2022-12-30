@@ -109,9 +109,6 @@ class CollectClient:
     def tick(self,count):
         self.world.tick()
         if count % int(self.config["keyframe_time"]/self.settings.fixed_delta_seconds) == 0:
-            ego_location = self.ego_vehicle.get_actor().get_transform().location
-            ego_rotation = self.ego_vehicle.get_actor().get_transform().rotation
-            print(ego_location,ego_rotation)
             for sensor in self.sensors:
                 print("sensor_data:",len(sensor.get_data()))
                 sensor.data_list.clear()
