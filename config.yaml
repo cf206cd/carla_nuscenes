@@ -2,7 +2,7 @@ description: |-
   example
 
 collect_time:
-  300
+  900
 
 keyframe_time:
   0.5
@@ -27,6 +27,7 @@ world:
     fog_density: 0 # Fog concentration or thickness. It only affects the RGB camera sensor. Values range from 0 to 100.
     fog_distance: 0 # Fog start distance. Values range from 0 to infinite.
     wetness: 0 # Wetness intensity. It only affects the RGB camera sensor. Values range from 0 to 100.
+   
     fog_falloff: 0 # Density of the fog (as in specific mass) from 0 to infinity. The bigger the value, the more dense and heavy it will be, and the fog will reach smaller heights. Corresponds to Fog Height Falloff in the UE docs.If the value is 0, the fog will be lighter than air, and will cover the whole scene.A value of 1 is approximately as dense as the air, and reaches normal-sized buildings.For values greater than 5, the air will be so dense that it will be compressed on ground level.
     scattering_intensity: 0 # Controls how much the light will contribute to volumetric fog. When set to 0, there is no contribution.
     mie_scattering_scale: 0 # Controls interaction of light with large particles like pollen or air pollution resulting in a hazy sky with halos around the light sources. When set to 0, there is no contribution.
@@ -37,20 +38,19 @@ ego_vehicle:
   init:
     bp_name: "vehicle.tesla.model3"
     location: 
-      x: -50.62303161621094
-      y: 16.47465705871582
+      x: -80.62303161621094
+      y: 27.47465705871582
       z: 0.5999999642372131
     rotation: 
-      yaw: 180
+      yaw: 0.15919798612594604
       pitch: 0.0
       roll: 0.0
-    options: null
+    options: ~
     path: 
       - 
-        x: -67.25457000732422
-        y: 25.96375846862793
+        x: -89.62303161621094
+        y: 16.47465705871582
         z: 0.5999999642372131
-
 
 CameraRGBBaseOptions: &CameraRGBBaseOptions
   "image_size_x": "1600"
@@ -59,76 +59,25 @@ CameraRGBBaseOptions: &CameraRGBBaseOptions
   "fstop": "1.8"
   "shutter_speed": "20.0"
 
-
+RadarBaseOptions: &RadarBaseOptions
+  'horizontal_fov': '80'
+  'vertical_fov': '30'
+  'points_per_second': '1500'
+  'range': '250'
+  'sensor_tick': '0.076923'
 
 sensors:
   - init: 
       name: "CAM_FRONT"
       bp_name: 'sensor.camera.rgb'
       location: 
-        x: 1.70079118954
-        y: 0.0159456324149
-        z: 1.51095763913
+        x: 0.8
+        y: 0
+        z: 1.5
       rotation:
         yaw: 0
-        pitch: 90
-        roll: -90
-      options: 
-          <<: *CameraRGBBaseOptions
-          "fov": "70"
-  - init: 
-      name: "CAM_FRONT_LEFT"
-      bp_name: 'sensor.camera.rgb'
-      location: 
-        x: 1.5508477543
-        y: -0.493404796419
-        z: 1.49574800619
-      rotation:
-        yaw: -55
-        pitch: 90
-        roll: -90
-      options: 
-          <<: *CameraRGBBaseOptions
-          "fov": "70"
-  - init: 
-      name: "CAM_BACK_LEFT"
-      bp_name: 'sensor.camera.rgb'
-      location: 
-        x: 1.0148780988
-        y: -0.480568219723
-        z: 1.56239545128
-      rotation:
-        yaw: -110
-        pitch: 90
-        roll: -90
-      options: 
-          <<: *CameraRGBBaseOptions
-          "fov": "70"
-  - init: 
-      name: "CAM_BACK"
-      bp_name: 'sensor.camera.rgb'
-      location: 
-        x: 0.0283260309358
-        y: 0.00345136761476
-        z: 1.57910346144
-      rotation:
-        yaw: -180
-        pitch: 90
-        roll: -90
-      options: 
-          <<: *CameraRGBBaseOptions
-          "fov": "110"
-  - init: 
-      name: "CAM_BACK_RIGHT"
-      bp_name: 'sensor.camera.rgb'
-      location: 
-        x: 0.0283260309358
-        y: 0.00345136761476
-        z: 1.57910346144
-      rotation:
-        yaw: 110
-        pitch: 90
-        roll: -90
+        pitch: 0
+        roll: 0
       options: 
           <<: *CameraRGBBaseOptions
           "fov": "70"
@@ -136,23 +85,196 @@ sensors:
       name: "CAM_FRONT_RIGHT"
       bp_name: 'sensor.camera.rgb'
       location: 
-        x: 1.52387798135
-        y: 0.494631336551
-        z: 1.50932822144
+        x: 0.8
+        y: 0.5
+        z: 1.5
       rotation:
         yaw: 55
-        pitch: 90
-        roll: -90
+        pitch: 0
+        roll: 0
       options: 
           <<: *CameraRGBBaseOptions
           "fov": "70"
+  - init: 
+      name: "CAM_FRONT_LEFT"
+      bp_name: 'sensor.camera.rgb'
+      location: 
+        x: 0.8
+        y: -0.5
+        z: 1.5
+      rotation:
+        yaw: -55
+        pitch: 0
+        roll: 0
+      options: 
+          <<: *CameraRGBBaseOptions
+          "fov": "70"
+  - init: 
+      name: "CAM_BACK_LEFT"
+      bp_name: 'sensor.camera.rgb'
+      location: 
+        x: -0.5
+        y: -0.5
+        z: 1.5
+      rotation:
+        yaw: -110
+        pitch: 0
+        roll: 0
+      options: 
+          <<: *CameraRGBBaseOptions
+          "fov": "70"
+  - init: 
+      name: "CAM_BACK"
+      bp_name: 'sensor.camera.rgb'
+      location: 
+        x: -0.5
+        y: 0
+        z: 1.5
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      options: 
+          <<: *CameraRGBBaseOptions
+          "fov": "110"
+  - init: 
+      name: "CAM_BACK_RIGHT"
+      bp_name: 'sensor.camera.rgb'
+      location: 
+        x: -0.5
+        y: 0
+        z: 1.5
+      rotation:
+        yaw: 110
+        pitch: 0
+        roll: 0
+      options: 
+          <<: *CameraRGBBaseOptions
+          "fov": "70"
+ #-----------radar----------
+  - init: 
+      name: "RADAR_FRONT"
+      bp_name: 'sensor.other.radar'
+      location: 
+        x: 2.04
+        y: 0
+        z: 1
+      rotation:
+        yaw: 0
+        pitch: 0
+        roll: 0
+      options: 
+          <<: *RadarBaseOptions
+  - init: 
+      name: "RADAR_FRONT_RIGHT"
+      bp_name: 'sensor.other.radar'
+      location: 
+        x: 1.8
+        y: 0.86
+        z: 1
+      rotation:
+        yaw: 90
+        pitch: 0
+        roll: 0
+      options: 
+          <<: *RadarBaseOptions
+
+  - init: 
+      name: "RADAR_FRONT_LEFT"
+      bp_name: 'sensor.other.radar'
+      location: 
+        x: 1.8
+        y: -0.86
+        z: 1
+      rotation:
+        yaw: -90
+        pitch: 0
+        roll: 0
+      options: 
+          <<: *RadarBaseOptions
+  - init: 
+      name: "RADAR_BACK_RIGHT"
+      bp_name: 'sensor.other.radar'
+      location: 
+        x: -1.8
+        y: 0.86
+        z: 1
+      rotation:
+        yaw: 90
+        pitch: 0
+        roll: 0
+      options: 
+          <<: *RadarBaseOptions
+  - init: 
+      name: "RADAR_BACK_LEFT"
+      bp_name: 'sensor.other.radar'
+      location: 
+        x: -1.8
+        y: -0.86
+        z: 1
+      rotation:
+        yaw: -90
+        pitch: 0
+        roll: 0
+      options: 
+          <<: *RadarBaseOptions
+
+ #-----------lidar----------
+  - init: 
+      name: 'LIDAR_TOP'
+      bp_name: 'sensor.lidar.ray_cast'
+      location: 
+        x: 0
+        y: 0
+        z: 1.5
+      rotation:
+        yaw: 0
+        pitch: 0
+        roll: 0
+      options: 
+        'channels': '32'
+        'points_per_second': '200000'
+        'range': '80'
+        'upper_fov': '10'
+        'lower_fov': '-30'
+        'horizontal_fov': '360'
+        'rotation_frequency': '20'
+        'sensor_tick': '0.05'
+#-----------gnss----------
+  - init: 
+      name: "GNSS"
+      bp_name: 'sensor.other.gnss'
+      location: 
+        x: 0
+        y: 0
+        z: 1.5
+      rotation:
+        yaw: 0
+        pitch: 0
+        roll: 0
+      options: ~
+#-----------imu----------
+  - init: 
+      name: "IMU"
+      bp_name: 'sensor.other.imu'
+      location: 
+        x: 0
+        y: 0
+        z: 1.5
+      rotation:
+        yaw: 0
+        pitch: 0
+        roll: 0
+      options: ~
+
+
 
 vehicles:
   - init:
       bp_name: "vehicle.tesla.model3"
       location:
-        x: -67.25457000732422
-        y: 25.96375846862793
+        x: -70.25457000732422
+        y: 27.96375846862793
         z: 0.5999999642372131
       rotation:
         yaw: 0.15919798612594604
@@ -165,8 +287,143 @@ vehicles:
   - init:
       bp_name: "vehicle.tesla.model3"
       location:
-        x: -67.25457000732422
-        y: 31.96375846862793
+        x: -70.25457000732422
+        y: 24.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -90.25457000732422
+        y: 24.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -90.25457000732422
+        y: 27.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131   
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: 10.25457000732422
+        y: 24.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: 10.25457000732422
+        y: 27.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131   
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -80.25457000732422
+        y: 24.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131           
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: 20.25457000732422
+        y: 24.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: 0.25457000732422
+        y: 24.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: 30.25457000732422
+        y: 27.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131   
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: 0.25457000732422
+        y: 27.96375846862793
         z: 0.5999999642372131
       rotation:
         yaw: 0.15919798612594604
@@ -179,8 +436,8 @@ vehicles:
   - init:
       bp_name: "vehicle.tesla.model3"
       location:
-        x: -67.25457000732422
-        y: 29.96375846862793
+        x: -20.25457000732422
+        y: 24.96375846862793
         z: 0.5999999642372131
       rotation:
         yaw: 0.15919798612594604
@@ -190,18 +447,371 @@ vehicles:
         - x: -87.62303161621094
           y: 12.967159271240234
           z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -30.25457000732422
+        y: 24.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -50.25457000732422
+        y: 27.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131   
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -40.25457000732422
+        y: 24.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131   
+
+# ------------------
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -70.25457000732422
+        y: 16.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -70.25457000732422
+        y: 12.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -90.25457000732422
+        y: 16.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -90.25457000732422
+        y: 12.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131   
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: 10.25457000732422
+        y: 16.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: 10.25457000732422
+        y: 12.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131   
+#====================================
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -80.25457000732422
+        y: 16.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131           
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: 20.25457000732422
+        y: 12.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: 0.25457000732422
+        y: 16.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: 30.25457000732422
+        y: 12.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131   
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: 0.25457000732422
+        y: 12.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -20.25457000732422
+        y: 12.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -30.25457000732422
+        y: 16.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -50.25457000732422
+        y: 12.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131   
+
+  - init:
+      bp_name: "vehicle.tesla.model3"
+      location:
+        x: -40.25457000732422
+        y: 16.96375846862793
+        z: 0.5999999642372131
+      rotation:
+        yaw: 180
+        pitch: 0
+        roll: 0
+      path:
+        - x: -87.62303161621094
+          y: 12.967159271240234
+          z: 0.5999999642372131   
+  
+
+
+
 walkers:
   - init:
       bp_name: "walker.pedestrian.0001"
       location:
-          x: -67.25457000732422
-          y: 10
+          x: -80.25457000732422
+          y: 30.96375846862793
           z: 0.5999999642372131
       rotation:
         yaw: 0.15919798612594604
         pitch: 0
         roll: 0
-      destination:
-          x: -100.25457000732422
-          y: 27.96375846862793
+      destination: ~
+  - init:
+      bp_name: "walker.pedestrian.0001"
+      location:
+          x: -70.25457000732422
+          y: 30.96375846862793
           z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      destination: ~
+
+  - init:
+      bp_name: "walker.pedestrian.0001"
+      location:
+          x: -80.25457000732422
+          y: 4.96375846862793
+          z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      destination: ~
+
+  - init:
+      bp_name: "walker.pedestrian.0001"
+      location:
+          x: -70.25457000732422
+          y: 4.96375846862793
+          z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      destination: ~
+
+  - init:
+      bp_name: "walker.pedestrian.0001"
+      location:
+          x: -80.25457000732422
+          y: 31.96375846862793
+          z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      destination: ~
+        
+  - init:
+      bp_name: "walker.pedestrian.0001"
+      location:
+          x: -75.25457000732422
+          y: 32.96375846862793
+          z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      destination: ~
+
+  - init:
+      bp_name: "walker.pedestrian.0001"
+      location:
+          x: -75.25457000732422
+          y: 5.96375846862793
+          z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      destination: ~
+
+  - init:
+      bp_name: "walker.pedestrian.0001"
+      location:
+          x: -70.25457000732422
+          y: 5.96375846862793
+          z: 0.5999999642372131
+      rotation:
+        yaw: 0.15919798612594604
+        pitch: 0
+        roll: 0
+      destination: ~

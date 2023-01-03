@@ -3,7 +3,7 @@ import carla
 from sensor import *
 from vehicle import Vehicle
 from walker import Walker
-import time
+
 def get_location(location):
     return (location.x,location.y,location.z)
     
@@ -28,7 +28,6 @@ class CollectClient:
             self.generate()
         except Exception:
             self.destroy()
-            time.sleep(0.5)
             raise Exception("Generate Fail!")
         print("Generate Success!")
 
@@ -57,13 +56,12 @@ class CollectClient:
                             .then(SetAutopilot(FutureActor, True, self.trafficmanager.get_port())) 
                             for vehicle in self.vehicles]
         for i,response in enumerate(self.client.apply_batch_sync(vehicles_batch)):
-            print(i)
             if not response.error:
                 self.vehicles[i].set_actor(response.actor_id)
             else:
                 print(response.error)
         self.vehicles = list(filter(lambda vehicle:vehicle.get_actor(),self.vehicles))
-        print(self.vehicles)
+
         for vehicle in self.vehicles:
             self.trafficmanager.set_path(vehicle.get_actor(),vehicle.path)
 
@@ -83,9 +81,9 @@ class CollectClient:
                         self.walkers[i].set_controller(response.actor_id)
                     else:
                         print(response.error)
+        self.world.tick()
         for walker in self.walkers:
             walker.start()
-
         self.sensors = [Sensor(world=self.world, attach_to=self.ego_vehicle.get_actor(), **sensor_config["init"]) for sensor_config in self.config["sensors"]]
         sensors_batch = [SpawnActor(sensor.blueprint,sensor.transform,sensor.attach_to) for sensor in self.sensors]
         for i,response in enumerate(self.client.apply_batch_sync(sensors_batch)):
@@ -149,4 +147,4 @@ class CollectClient:
         points =  self.world.cast_ray(ego_bbox_center,target_bbox_center)
         points = list(filter(lambda point:not ego.get_actor().bounding_box.contains(point.location,ego.get_actor().get_transform()) 
                             and not target.get_actor().bounding_box.contains(point.location,target.get_actor().get_transform()),points))
-        return points
+        return points is True

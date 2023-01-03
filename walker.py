@@ -1,7 +1,7 @@
 from actor import Actor
 import carla
 class Walker(Actor):
-    def __init__(self,destination,**args):
+    def __init__(self,destination=None,**args):
         super().__init__(**args)
         if self.blueprint.has_attribute('is_invincible'):
             self.blueprint.set_attribute('is_invincible', 'false')
@@ -10,7 +10,7 @@ class Walker(Actor):
             self.destination = self.world.get_random_location_from_navigation()
         else:
             self.destination = carla.Location(**destination)
-        
+
         self.controller = None
     
     def set_controller(self,id):
