@@ -1,9 +1,11 @@
 import numpy as np
+import carla
 from actor import Actor
+import queue
 
 def parse_image(image):
     array = np.frombuffer(image.raw_data, dtype=np.dtype("uint8"))
-    image = array.copy()
+    array = array.copy()
     array = np.reshape(array, (image.height, image.width, 4))
     return array
 
@@ -20,32 +22,29 @@ def parse_radar_data(radar_data):
     points = points.copy()
     return points
 
-def save_image(image,path):
-    image.save_to_disk(path)
-
-def save_lidar_data(lidar_data,path):
-    points = parse_lidar_data(lidar_data)
-    points.tofile(path)
-
-def save_radar_data(radar_data,path):
-    points = parse_radar_data(radar_data)
-    points.tofile(path)
-
+def parse_data(data):
+    if isinstance(data,carla.Image):
+        return parse_image(data)
+    elif isinstance(data,carla.RadarMeasurement):
+        return parse_radar_data(data)
+    elif isinstance(data,carla.LidarMeasurement):
+        return parse_lidar_data(data)
 class Sensor(Actor):
     def __init__(self, name, **args):
         super().__init__(**args)
         self.name = name
-        self.data_list = []
+        self.data_queue = queue.Queue()
     
-    def get_data(self):
-        return self.data_list
+    def get_queue(self):
+        return self.data_queue
     
     def set_actor(self, id):
         super().set_actor(id)
-        self.actor.listen(self.add_data)
+        self.actor.listen(self.put_data)
 
-    def get_last_data(self):
-        return self.data_list[-1]
+    def get_data(self):
+        return self.data_queue.get(True)
 
-    def add_data(self,data):
-        self.data_list.append((self.actor.parent.get_location(),data))
+    def put_data(self,data):
+        self.data_queue.put((self.actor.parent.get_location(),data),True)
+

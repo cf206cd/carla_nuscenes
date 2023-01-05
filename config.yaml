@@ -15,7 +15,7 @@ client:
 
 world:
   init:
-    fixed_delta_seconds: 0.05
+    fixed_delta_seconds: 0.01
   weather_mode: "custom"
   weather:
     cloudiness: 0 # Values range from 0 to 100, being 0 a clear sky and 100 one completely covered with clouds.
@@ -55,7 +55,7 @@ ego_vehicle:
 CameraRGBBaseOptions: &CameraRGBBaseOptions
   "image_size_x": "1600"
   "image_size_y": "900"
-  "sensor_tick": "0.0833333"
+  "sensor_tick": "0.083333"
   "fstop": "1.8"
   "shutter_speed": "20.0"
 

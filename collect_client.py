@@ -1,16 +1,16 @@
-import yaml
 import carla
 from sensor import *
 from vehicle import Vehicle
 from walker import Walker
+from dataset import Dataset
 
 def get_location(location):
     return (location.x,location.y,location.z)
     
 class CollectClient:
-    def __init__(self,config_path):
-        with open(config_path,'r') as f:
-            self.config = yaml.load(f.read(),Loader=yaml.CLoader)
+    def __init__(self,config,dataset:Dataset):
+        self.config = config
+        self.dataset = dataset
         self.client = carla.Client(**self.config["client"]["init"])
         self.client.set_timeout(self.config["client"]["time_out"])
         
@@ -94,11 +94,12 @@ class CollectClient:
         self.sensors = list(filter(lambda sensor:sensor.get_actor(),self.sensors))
 
 
-    def run(self):
+    def run(self,scene_token):
         try:
             for count in range(int(self.config["collect_time"]/self.settings.fixed_delta_seconds)):
                 print("count:",count)
                 self.tick(count)
+                self.dataset.add_sample(scene_token,)
         except Exception as err:
             print(err)
         finally:
@@ -106,12 +107,13 @@ class CollectClient:
 
     def tick(self,count):
         self.world.tick()
-        if count % int(self.config["keyframe_time"]/self.settings.fixed_delta_seconds) == 0:
+        if (count+1) % int(self.config["keyframe_time"]/self.settings.fixed_delta_seconds) == 0:
             for sensor in self.sensors:
-                print("sensor_data:",len(sensor.get_data()))
-                if sensor.data_list:
-                    print("last data",get_location(sensor.get_last_data()[0]),sensor.get_last_data()[1])
-                sensor.data_list.clear()
+                if sensor.name.startswith("CAM_"):
+                    print("before sensor_data:",sensor.name,sensor.get_queue().qsize())
+                    while sensor.get_queue().empty() is False:
+                        ego_pose,data = sensor.get_data()
+                        
             for walker in self.walkers:
                 if(self.is_invisible(self.ego_vehicle,walker)):
                     print("invisible walker location",walker.get_location())
