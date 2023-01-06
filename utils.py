@@ -17,7 +17,7 @@ def load(path):
     with open(path, "r") as filedata:
         return json.load(filedata)
 
-def get_intrinsics(fov, image_size_x,image_size_y):
+def get_intrinsic(fov, image_size_x,image_size_y):
     focal = image_size_x / (2.0 * np.tan(fov * np.pi / 360.0))
     K = np.identity(3)
     K[0, 0] = K[1, 1] = focal

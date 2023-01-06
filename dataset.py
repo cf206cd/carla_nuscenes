@@ -59,46 +59,56 @@ class Dataset:
         for item in self.data[key]:
             if item["token"] == token:
                 return item
+        return None
 
-    def add_map(self,name,category):
+    def update_map(self,name,category):
         map_item = {}
         map_item["category"] = category
         map_item["token"] = get_token("map",name)
         map_item["filename"] = os.path.join("maps",map_item["token"]+".png")
         map_item["log_tokens"] = []
+        if self.get_item("map",map_item["token"]) is not None:
+            self.data["map"].remove(self.get_item("map",map_item["token"]))
         self.data["map"].append(map_item)
         return map_item["token"]
 
-    def add_log(self,map_token,date,time,timezone,vehicle,location):
+    def update_log(self,map_token,date,time,timezone,vehicle,location):
         log_item = {}
         log_item["logfile"] = vehicle+"-"+date+"-"+time+timezone
         log_item["token"] = get_token("log",map_token+log_item["logfile"])
         log_item["vehicle"] = vehicle
         log_item["date_captured"] = date
         log_item["location"] = location
-        self.data["log"].append(log_item)
         map_item = self.get_item("map",map_token)
         map_item["log_tokens"].append(log_item["token"])
+        if self.get_item("log",log_item["token"]) is not None:
+            self.data["log"].remove(self.get_item("log",log_item["token"]))
+        self.data["log"].append(log_item)
         return log_item["token"]
 
-    def add_sensor(self,channel,modality):
+    def update_sensor(self,channel,modality):
         sensor_item = {}
         sensor_item["token"] = get_token("sensor",channel)
         sensor_item["channel"] = channel
         sensor_item["modality"] = modality
+        if self.get_item("sensor",sensor_item["token"]) is not None:
+            self.data["sensor"].remove(self.get_item("sensor",sensor_item["token"]))
         self.data["sensor"].append(sensor_item)
         return sensor_item["token"]
 
-    def add_calibrated_sensor(self,scene_token,channel,translation,rotation,intrinsic):
+    def update_calibrated_sensor(self,scene_token,sensor_token,channel,translation,rotation,intrinsic):
         calibrated_sensor_item = {}
         calibrated_sensor_item["token"] = get_token("calibrated_sensor",scene_token+channel)
+        calibrated_sensor_item["sensor_token"] = sensor_token
         calibrated_sensor_item["translation"] = translation
         calibrated_sensor_item["rotation"] = rotation
         calibrated_sensor_item["intrinsic"] = intrinsic
+        if self.get_item("calibrated_sensor",calibrated_sensor_item["token"]) is not None:
+            self.data["calibrated_sensor"].remove(self.get_item("calibrated_sensor",calibrated_sensor_item["token"]))
         self.data["calibrated_sensor"].append(calibrated_sensor_item)
         return calibrated_sensor_item["token"]
 
-    def add_scene(self,log_token,id,description):
+    def update_scene(self,log_token,id,description):
         scene_item = {}
         scene_item["name"] = "scene-"+str(id)
         scene_item["token"] = get_token("scene",log_token+scene_item["name"])
@@ -107,10 +117,12 @@ class Dataset:
         scene_item["nbr_samples"] = 0
         scene_item["first_sample_token"] = ""
         scene_item["last_sample_token"] = ""
+        if self.get_item("scene",scene_item["token"]) is not None:
+            self.data["scene"].remove(self.get_item("scene",scene_item["token"]))
         self.data["scene"].append(scene_item)
         return scene_item["token"]
 
-    def add_sample(self,scene_token,timestamp,prev):
+    def update_sample(self,prev,scene_token,timestamp):
         sample_item = {}
         sample_item["token"] = get_token("sample",scene_token+str(timestamp))
         sample_item["timestamp"] = timestamp
@@ -123,10 +135,12 @@ class Dataset:
             self.get_item("sample",prev)["next"] = sample_item["token"]
         scene_item["last_sample_token"] = sample_item["token"]
         scene_item["nbr_samples"] += 1
+        if self.get_item("sample",sample_item["token"]) is not None:
+            self.data["sample"].remove(self.get_item("sample",sample_item["token"]))
         self.data["sample"].append(sample_item)
         return sample_item["token"]
 
-    def add_sample_data(self,calibrated_sensor_token,sample_token,ego_pose_token,is_key_frame,height,width,prev):
+    def update_sample_data(self,prev,calibrated_sensor_token,sample_token,ego_pose_token,is_key_frame,height,width):
         sample_data_item = {}
         sample_data_item["token"] = ego_pose_token
         sample_data_item["sample_token"] = sample_token
@@ -145,55 +159,67 @@ class Dataset:
         sample_data_item["next"] = ""
         if prev != "":
             self.get_item("sample_data",prev)["next"] = ego_pose_token
+        if self.get_item("sample_data",sample_data_item["token"]) is not None:
+            self.data["sample_data"].remove(self.get_item("sample_data",sample_data_item["token"]))
         self.data["sample_data"].append(sample_data_item)
         return sample_data_item["token"]
 
-    def add_ego_pose(self,scene_token,timestamp,rotation,translation):
+    def update_ego_pose(self,scene_token,timestamp,translation,rotation):
         ego_pose_item = {}
         ego_pose_item["token"] = get_token("ego_pose",scene_token+str(timestamp))
         ego_pose_item["timestamp"] = timestamp
         ego_pose_item["rotation"] = rotation
         ego_pose_item["translation"] = translation
+        if self.get_item("ego_pose",ego_pose_item["token"]) is not None:
+            self.data["ego_pose"].remove(self.get_item("ego_pose",ego_pose_item["token"]))
         self.data["ego_pose"].append(ego_pose_item)
         return ego_pose_item["token"]
 
-    def add_visibility(self,description,level):
+    def update_visibility(self,description,level):
         visibility_item = {}
         visibility_item["token"] = str(len(self.data["visibility"]))
         visibility_item["description"] = description
         visibility_item["level"] = level
-        self.data["visibility"].append(visibility_item)
+        if self.get_item("visibility",visibility_item["token"]) is not None:
+            self.data["visibility"].remove(self.get_item("visibility",visibility_item["token"]))
+        self.data["visibility"].append(visibility_item)        
         return visibility_item["token"]
 
-    def add_attribute(self,name,description):
+    def update_attribute(self,name,description):
         attribute_item = {}
         attribute_item["token"] = get_token("attribute",name)
         attribute_item["name"] = name
         attribute_item["description"] = description
+        if self.get_item("attribute",attribute_item["token"]) is not None:
+            self.data["attribute"].remove(self.get_item("attribute",attribute_item["token"]))
         self.data["attribute"].append(attribute_item)
         return attribute_item["token"]
 
-    def add_category(self,name,description):
+    def update_category(self,name,description):
         category_item = {}
         category_item["token"] = get_token("category",name)
         category_item["name"] = name
         category_item["description"] = description
+        if self.get_item("category",category_item["token"]) is not None:
+            self.data["category"].remove(self.get_item("category",category_item["token"]))
         self.data["category"].append(category_item)
         return category_item["token"]
 
-    def add_instance(self,category_token,id):
+    def update_instance(self,category_token,id):
         instance_item = {}
         instance_item["token"] = get_token("instance",id)
         instance_item["category_token"] = category_token
         instance_item["nbr_annotations"] = 0
         instance_item["first_annotation_token"] = ""
         instance_item["last_annotation_token"] = ""
+        if self.get_item("instance",instance_item["token"]) is not None:
+            self.data["instance"].remove(self.get_item("instance",instance_item["token"]))
         self.data["instance"].append(instance_item)
         return instance_item["token"]
 
-    def add_sample_annotation(self,sample_token,instance_token,visibility_token,
+    def update_sample_annotation(self,prev,sample_token,instance_token,visibility_token,
                             attribute_tokens,translation,rotation,
-                            size,prev,num_lidar_pts,num_radar_pts):
+                            size,num_lidar_pts,num_radar_pts):
         sample_annotation_item = {}
         sample_annotation_item["token"] = get_token("sample_annotation",sample_token+instance_token)
         sample_annotation_item["sample_token"] = sample_token
@@ -214,6 +240,8 @@ class Dataset:
             self.get_item("instance",prev)["next"] = instance_item["token"]
         instance_item["last_annotation_token"] = instance_item["token"]
         instance_item["nbr_annotations"] += 1
+        if self.get_item("sample_annotation",sample_annotation_item["token"]) is not None:
+            self.data["sample_annotation"].remove(self.get_item("sample_annotation",sample_annotation_item["token"]))
         self.data["sample_annotation"].append(sample_annotation_item)
         return sample_annotation_item["token"]
 

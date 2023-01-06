@@ -1,7 +1,6 @@
 import numpy as np
 import carla
 from actor import Actor
-import queue
 
 def parse_image(image):
     array = np.frombuffer(image.raw_data, dtype=np.dtype("uint8"))
@@ -33,18 +32,18 @@ class Sensor(Actor):
     def __init__(self, name, **args):
         super().__init__(**args)
         self.name = name
-        self.data_queue = queue.Queue()
+        self.data_list = []
     
-    def get_queue(self):
-        return self.data_queue
+    def get_data_list(self):
+        return self.data_list
     
     def set_actor(self, id):
         super().set_actor(id)
-        self.actor.listen(self.put_data)
+        self.actor.listen(self.add_data)
 
-    def get_data(self):
-        return self.data_queue.get(True)
+    def get_last_data(self):
+        return self.data_list
 
-    def put_data(self,data):
-        self.data_queue.put((self.actor.parent.get_location(),data),True)
+    def add_data(self,data):
+        self.data_list.append((self.actor.parent.get_location(),data))
 
