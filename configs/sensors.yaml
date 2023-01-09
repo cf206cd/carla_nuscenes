@@ -1,0 +1,51 @@
+#-----------camera----------
+-
+    name: "CAM_FRONT"
+    modality: 'camera'
+
+- 
+    name: "CAM_FRONT_RIGHT"
+    modality: 'camera'
+
+- 
+    name: "CAM_FRONT_LEFT"
+    modality: 'camera'
+
+- 
+    name: "CAM_BACK_LEFT"
+    modality: 'camera'
+
+- 
+    name: "CAM_BACK"
+    modality: 'camera'
+
+- 
+    name: "CAM_BACK_RIGHT"
+    modality: 'camera'
+
+#-----------radar----------
+- 
+    name: "RADAR_FRONT"
+    modality: 'radar'
+
+- 
+    name: "RADAR_FRONT_RIGHT"
+    modality: 'radar'
+
+
+- 
+    name: "RADAR_FRONT_LEFT"
+    modality: 'radar'
+
+- 
+    name: "RADAR_BACK_RIGHT"
+    modality: 'radar'
+
+- 
+    name: "RADAR_BACK_LEFT"
+    modality: 'radar'
+
+#-----------lidar----------
+- 
+    name: 'LIDAR_TOP'
+    modality: 'lidar'

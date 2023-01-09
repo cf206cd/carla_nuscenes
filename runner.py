@@ -1,11 +1,12 @@
 from collect_client import CollectClient
 from dataset import Dataset
 import yaml
-
+from yamlinclude import YamlIncludeConstructor
+YamlIncludeConstructor.add_to_loader_class(loader_class=yaml.FullLoader)
 class Runner:
     def __init__(self,config_path):
         with open(config_path,'r') as f:
-            self.config = yaml.load(f.read(),Loader=yaml.CLoader)
+            self.config = yaml.load(f.read(),Loader=yaml.FullLoader)
         print(self.config)
         self.dataset = Dataset(**self.config["dataset"])
         self.collect_client = CollectClient(self.config["client"])
@@ -23,7 +24,7 @@ class Runner:
         for world_config in self.config["worlds"]:
             try:
                 self.collect_client.generate_world(world_config)
-                map_token = self.dataset.update_map(world_config["name"],world_config["catogory"])
+                map_token = self.dataset.update_map(world_config["map_name"],world_config["map_catogory"])
                 for capture_config in world_config["captures"]:
                     log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
                                             capture_config["timezone"],capture_config["vehicle"],capture_config["location"])

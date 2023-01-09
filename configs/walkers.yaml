@@ -1,0 +1,95 @@
+walkers:
+  - 
+    bp_name: "walker.pedestrian.0001"
+    location:
+        x: -80.25457000732422
+        y: 30.96375846862793
+        z: 0.5999999642372131
+    rotation:
+      yaw: 0.15919798612594604
+      pitch: 0
+      roll: 0
+    destination: ~
+  - 
+    bp_name: "walker.pedestrian.0001"
+    location:
+        x: -70.25457000732422
+        y: 30.96375846862793
+        z: 0.5999999642372131
+    rotation:
+      yaw: 0.15919798612594604
+      pitch: 0
+      roll: 0
+    destination: ~
+
+  - 
+    bp_name: "walker.pedestrian.0001"
+    location:
+        x: -80.25457000732422
+        y: 4.96375846862793
+        z: 0.5999999642372131
+    rotation:
+      yaw: 0.15919798612594604
+      pitch: 0
+      roll: 0
+    destination: ~
+
+  - 
+    bp_name: "walker.pedestrian.0001"
+    location:
+        x: -70.25457000732422
+        y: 4.96375846862793
+        z: 0.5999999642372131
+    rotation:
+      yaw: 0.15919798612594604
+      pitch: 0
+      roll: 0
+    destination: ~
+
+  - 
+    bp_name: "walker.pedestrian.0001"
+    location:
+        x: -80.25457000732422
+        y: 31.96375846862793
+        z: 0.5999999642372131
+    rotation:
+      yaw: 0.15919798612594604
+      pitch: 0
+      roll: 0
+    destination: ~
+      
+  - 
+    bp_name: "walker.pedestrian.0001"
+    location:
+        x: -75.25457000732422
+        y: 32.96375846862793
+        z: 0.5999999642372131
+    rotation:
+      yaw: 0.15919798612594604
+      pitch: 0
+      roll: 0
+    destination: ~
+
+  - 
+    bp_name: "walker.pedestrian.0001"
+    location:
+        x: -75.25457000732422
+        y: 5.96375846862793
+        z: 0.5999999642372131
+    rotation:
+      yaw: 0.15919798612594604
+      pitch: 0
+      roll: 0
+    destination: ~
+
+  - 
+    bp_name: "walker.pedestrian.0001"
+    location:
+        x: -70.25457000732422
+        y: 5.96375846862793
+        z: 0.5999999642372131
+    rotation:
+      yaw: 0.15919798612594604
+      pitch: 0
+      roll: 0
+    destination: ~

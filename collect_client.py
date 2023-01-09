@@ -6,7 +6,7 @@ from utils import get_token,get_rt,get_intrinsic
     
 class CollectClient:
     def __init__(self,client_config):
-        self.client = carla.Client(client_config["host"],client_config["ip"])
+        self.client = carla.Client(client_config["host"],client_config["port"])
         self.client.set_timeout(client_config["time_out"])
 
     def generate_world(self,world_config):
@@ -38,12 +38,12 @@ class CollectClient:
         SetAutopilot = carla.command.SetAutopilot
         FutureActor = carla.command.FutureActor
 
-        self.ego_vehicle = Vehicle(world=self.world,**scene_config["ego_vehicle"]["init"])
+        self.ego_vehicle = Vehicle(world=self.world,**scene_config["ego_vehicle"])
         self.ego_vehicle.blueprint.set_attribute('role_name', 'hero')
         self.ego_vehicle.spawn_actor()
         self.ego_vehicle.get_actor().set_autopilot()
 
-        self.vehicles = [Vehicle(world=self.world,**vehicle_config["init"]) for vehicle_config in scene_config["vehicles"]]
+        self.vehicles = [Vehicle(world=self.world,**vehicle_config) for vehicle_config in scene_config["vehicles"]]
         vehicles_batch = [SpawnActor(vehicle.blueprint,vehicle.transform)
                             .then(SetAutopilot(FutureActor, True, self.trafficmanager.get_port())) 
                             for vehicle in self.vehicles]
@@ -57,7 +57,7 @@ class CollectClient:
         for vehicle in self.vehicles:
             self.trafficmanager.set_path(vehicle.get_actor(),vehicle.path)
 
-        self.walkers = [Walker(world=self.world,**walker_config["init"]) for walker_config in scene_config["walkers"]]
+        self.walkers = [Walker(world=self.world,**walker_config) for walker_config in scene_config["walkers"]]
         walkers_batch = [SpawnActor(walker.blueprint,walker.transform) for walker in self.walkers]
         for i,response in enumerate(self.client.apply_batch_sync(walkers_batch)):
             if not response.error:
@@ -76,7 +76,7 @@ class CollectClient:
         self.world.tick()
         for walker in self.walkers:
             walker.start()
-        self.sensors = [Sensor(world=self.world, attach_to=self.ego_vehicle.get_actor(), **sensor_config["init"]) for sensor_config in scene_config["calibration"]]
+        self.sensors = [Sensor(world=self.world, attach_to=self.ego_vehicle.get_actor(), **sensor_config) for sensor_config in scene_config["calibrations"]]
         sensors_batch = [SpawnActor(sensor.blueprint,sensor.transform,sensor.attach_to) for sensor in self.sensors]
         for i,response in enumerate(self.client.apply_batch_sync(sensors_batch)):
             if not response.error:
