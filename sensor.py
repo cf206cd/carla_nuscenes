@@ -28,6 +28,12 @@ def parse_data(data):
         return parse_radar_data(data)
     elif isinstance(data,carla.LidarMeasurement):
         return parse_lidar_data(data)
+
+def get_data_shape(data):
+    if isinstance(data,carla.Image):
+        return data.height,data.width
+    else:
+        return 0,0
 class Sensor(Actor):
     def __init__(self, name, **args):
         super().__init__(**args)
@@ -45,5 +51,4 @@ class Sensor(Actor):
         return self.data_list
 
     def add_data(self,data):
-        self.data_list.append((self.actor.parent.get_location(),data))
-
+        self.data_list.append((self.actor.parent.get_transform(),data))

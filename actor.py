@@ -1,6 +1,6 @@
 import carla
 class Actor:
-    def __init__(self,scene,world,bp_name,location,rotation,options=None,attach_to=None):
+    def __init__(self,world,bp_name,location,rotation,options=None,attach_to=None):
         self.bp_name = bp_name
         self.world = world
         self.blueprint = world.get_blueprint_library().find(bp_name)
@@ -10,7 +10,6 @@ class Actor:
         self.transform = carla.Transform(carla.Location(**location),carla.Rotation(**rotation))
         self.attach_to = attach_to
         self.actor = None
-        self.scene = scene
 
     def set_actor(self,id):
         self.actor = self.world.get_actor(id)
@@ -30,7 +29,7 @@ class Actor:
         return carla.Transform(location,rotation)
 
     def get_size(self):
-        return self.bounding_box.ext*2
+        return self.actor.bounding_box.extent*2
 
     def get_bbox(self):
         return self.actor.bounding_box.get_world_vertices(self.actor.get_transform())

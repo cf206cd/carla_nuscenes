@@ -2,7 +2,7 @@ import carla
 from sensor import *
 from vehicle import Vehicle
 from walker import Walker
-from utils import get_token,get_rt,get_intrinsic
+from utils import get_token,get_rt,get_intrinsic,transform_timestamp
     
 class CollectClient:
     def __init__(self,client_config):
@@ -10,6 +10,7 @@ class CollectClient:
         self.client.set_timeout(client_config["time_out"])
 
     def generate_world(self,world_config):
+        print("generate world start!")
         self.client.load_world(world_config["map_name"])
         self.world = self.client.get_world()
         self.original_settings = self.world.get_settings()
@@ -24,12 +25,14 @@ class CollectClient:
         self.trafficmanager = self.client.get_trafficmanager()
         self.trafficmanager.set_synchronous_mode(True)
         self.trafficmanager.set_respawn_dormant_vehicles(True)
-        self.settings = carla.WorldSettings(world_config["settings"])
+        self.settings = carla.WorldSettings(**world_config["settings"])
         self.settings.synchronous_mode = True
         self.settings.no_rendering_mode = False
         self.world.apply_settings(self.settings)
+        print("generate world success!")
 
     def generate_scene(self,scene_config):
+        print("generate scene start!")
         if scene_config["weather_mode"] == "custom":
             self.weather = carla.WeatherParameters(**scene_config["weather"])
             self.world.set_weather(self.weather)
@@ -43,10 +46,12 @@ class CollectClient:
         self.ego_vehicle.spawn_actor()
         self.ego_vehicle.get_actor().set_autopilot()
 
+        print(scene_config["vehicles"])
         self.vehicles = [Vehicle(world=self.world,**vehicle_config) for vehicle_config in scene_config["vehicles"]]
         vehicles_batch = [SpawnActor(vehicle.blueprint,vehicle.transform)
                             .then(SetAutopilot(FutureActor, True, self.trafficmanager.get_port())) 
                             for vehicle in self.vehicles]
+
         for i,response in enumerate(self.client.apply_batch_sync(vehicles_batch)):
             if not response.error:
                 self.vehicles[i].set_actor(response.actor_id)
@@ -57,6 +62,7 @@ class CollectClient:
         for vehicle in self.vehicles:
             self.trafficmanager.set_path(vehicle.get_actor(),vehicle.path)
 
+        print(scene_config["walkers"])
         self.walkers = [Walker(world=self.world,**walker_config) for walker_config in scene_config["walkers"]]
         walkers_batch = [SpawnActor(walker.blueprint,walker.transform) for walker in self.walkers]
         for i,response in enumerate(self.client.apply_batch_sync(walkers_batch)):
@@ -76,7 +82,9 @@ class CollectClient:
         self.world.tick()
         for walker in self.walkers:
             walker.start()
-        self.sensors = [Sensor(world=self.world, attach_to=self.ego_vehicle.get_actor(), **sensor_config) for sensor_config in scene_config["calibrations"]]
+
+        print(scene_config["calibrated_sensors"])
+        self.sensors = [Sensor(world=self.world, attach_to=self.ego_vehicle.get_actor(), **sensor_config) for sensor_config in scene_config["calibrated_sensors"]["sensors"]]
         sensors_batch = [SpawnActor(sensor.blueprint,sensor.transform,sensor.attach_to) for sensor in self.sensors]
         for i,response in enumerate(self.client.apply_batch_sync(sensors_batch)):
             if not response.error:
@@ -84,6 +92,7 @@ class CollectClient:
             else:
                 print(response.error)
         self.sensors = list(filter(lambda sensor:sensor.get_actor(),self.sensors))
+        print("generate scene success!")
 
     def tick(self):
         self.world.tick()
@@ -111,26 +120,28 @@ class CollectClient:
         self.walkers = None
         self.world.apply_settings(self.original_settings)
 
-    def is_invisible(self,ego,target):
+    def cast_ray(self,ego,target):
         ego_bbox_center = ego.get_location()
         target_bbox_center = target.get_location()
         points =  self.world.cast_ray(ego_bbox_center,target_bbox_center)
-        points = list(filter(lambda point:not ego.get_actor().bounding_box.contains(point.location,ego.get_actor().get_transform()) 
-                            and not target.get_actor().bounding_box.contains(point.location,target.get_actor().get_transform()),points))
-        return points is True
+        points = list(filter(lambda point:not ego.bounding_box.contains(point.location,ego.get_transform()) 
+                            and not target.bounding_box.contains(point.location,target.get_transform()),points))
+        return points
 
     def get_calibrated_sensor(self,sensor):
         sensor_token = get_token("sensor",sensor.name)
         channel = sensor.name
         rotation,translation = get_rt(sensor.transform)
         if sensor.bp_name == "sensor.camera.rgb":
-            intrinsic = get_intrinsic(sensor.fov,sensor.image_size_x,sensor.image_size_y)
+            intrinsic = get_intrinsic(float(sensor.get_actor().attributes["fov"]),
+                            float(sensor.get_actor().attributes["image_size_x"]),
+                            float(sensor.get_actor().attributes["image_size_y"])).tolist()
         else:
             intrinsic = []
         return sensor_token,channel,translation,rotation,intrinsic
         
     def get_ego_pose(self,sample_data):
-        timestamp = sample_data[1].timestamp
+        timestamp = transform_timestamp(sample_data[1].timestamp)
         rotation,translation = get_rt(sample_data[0])
         return timestamp,translation,rotation
     
@@ -140,7 +151,10 @@ class CollectClient:
         if isinstance(sample_data,carla.Image):
             height = sample_data.height
             width = sample_data.width
-        return height,width
+        return sample_data,height,width
+
+    def get_sample(self):
+        return (transform_timestamp(self.world.get_snapshot().timestamp.elapsed_seconds),)
 
     def get_instance(self,scene_id,instance):
         category_token = get_token("category",self.category_dict[instance.bp_name])
@@ -148,18 +162,18 @@ class CollectClient:
         return category_token,id
 
     def get_sample_annotation(self,scene_id,instance):
-        instance_token = get_token("token",hash((scene_id,instance.get_actor().id)))
+        instance_token = get_token("instance",hash((scene_id,instance.get_actor().id)))
         visibility_token = str(self.get_visibility(instance))
         attribute_tokens = [get_token("attribute",attribute) for attribute in self.get_attributes(instance)]
         rotation,translation = get_rt(instance.get_transform())
-        size = instance.get_size()
+        size = [instance.get_size().x,instance.get_size().y,instance.get_size().z]
         num_lidar_pts = 4#todo
         num_radar_pts = 4#todo
         return instance_token,visibility_token,attribute_tokens,translation,rotation,size,num_lidar_pts,num_radar_pts
 
 
-    def get_visibility(self,instance):
+    def get_visibility(self,visibility):
         return 4#todo
 
     def get_attributes(self,instance):
-        return "vehicle.parked"#todo
+        return ["vehicle.parked"]#todo

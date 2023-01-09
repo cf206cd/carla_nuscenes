@@ -16,17 +16,26 @@ def save_radar_data(radar_data,path):
 
 def save_data(data,path):
     if isinstance(data,carla.Image):
-        return save_image(data,path)
+        save_image(data,path)
     elif isinstance(data,carla.RadarMeasurement):
-        return parse_radar_data(data,path)
+        save_radar_data(data,path)
     elif isinstance(data,carla.LidarMeasurement):
-        return save_lidar_data(data,path)   
+        save_lidar_data(data,path)   
+
+def mkdir(path):
+    if not os.path.exists(path):
+        os.mkdir(path)
 
 class Dataset:
     def __init__(self,root,version,load=True):
         self.root = root
         self.version = version
         self.json_dir = os.path.join(root,version)
+        mkdir(root)
+        mkdir(self.json_dir)
+        mkdir(os.path.join(root,"maps"))
+        mkdir(os.path.join(root,"samples"))
+        mkdir(os.path.join(root,"sweeps"))
         self.data = {
             "attribute":[],
             "calibrated_sensor":[],
@@ -94,6 +103,8 @@ class Dataset:
         if self.get_item("sensor",sensor_item["token"]) is not None:
             self.data["sensor"].remove(self.get_item("sensor",sensor_item["token"]))
         self.data["sensor"].append(sensor_item)
+        mkdir(os.path.join(self.root,"samples",channel))
+        mkdir(os.path.join(self.root,"sweeps",channel))
         return sensor_item["token"]
 
     def update_calibrated_sensor(self,scene_token,sensor_token,channel,translation,rotation,intrinsic):
@@ -128,6 +139,7 @@ class Dataset:
         sample_item["timestamp"] = timestamp
         sample_item["prev"] = prev
         sample_item["next"] = ""
+        sample_item["scene_token"] = scene_token
         scene_item  = self.get_item("scene",scene_token)
         if prev == "":
             scene_item["first_sample_token"] = sample_item["token"]
@@ -140,7 +152,7 @@ class Dataset:
         self.data["sample"].append(sample_item)
         return sample_item["token"]
 
-    def update_sample_data(self,prev,calibrated_sensor_token,sample_token,ego_pose_token,is_key_frame,height,width):
+    def update_sample_data(self,prev,calibrated_sensor_token,sample_token,ego_pose_token,is_key_frame,sample_data,height,width):
         sample_data_item = {}
         sample_data_item["token"] = ego_pose_token
         sample_data_item["sample_token"] = sample_token
@@ -157,6 +169,10 @@ class Dataset:
         sample_data_item["width"] = width
         sample_data_item["prev"] = prev
         sample_data_item["next"] = ""
+        filename = self.get_filename(sample_data_item)
+        print("filename",filename)
+        save_data(sample_data[1],os.path.join(self.root,filename))
+        sample_data_item["filename"] = filename
         if prev != "":
             self.get_item("sample_data",prev)["next"] = ego_pose_token
         if self.get_item("sample_data",sample_data_item["token"]) is not None:
@@ -245,14 +261,14 @@ class Dataset:
         self.data["sample_annotation"].append(sample_annotation_item)
         return sample_annotation_item["token"]
 
-    def save_data(self,sample_data_token,data):
-        sample_data_item = self.get_item("sample_data",sample_data_token)
+    def get_filename(self,sample_data_item):
         channel = self.get_item("sensor",self.get_item("calibrated_sensor",sample_data_item["calibrated_sensor_token"])["sensor_token"])["channel"]
         if sample_data_item["is_key_frame"]:
             dir = "samples"
         else:
             dir = "sweeps"
-        log_file = self.get_item("log",self.get_item("scene",self.get_item("sample",sample_data_item["sample_token"])["scene_token"])["log_token"])["log_file"]
-        filename = log_file+"_"+channel+"_"+sample_data_item["timestamp"]+"."+sample_data_item["fileformat"]
-        path = os.path.join(self.root,dir,channel,filename)
-        save_data(path,data)
+        log_file = self.get_item("log",self.get_item("scene",self.get_item("sample",sample_data_item["sample_token"])["scene_token"])["log_token"])["logfile"]
+        name = log_file+"_"+channel+"_"+str(sample_data_item["timestamp"])+"."+sample_data_item["fileformat"]
+        filename = os.path.join(dir,channel,name)
+        return filename
+        

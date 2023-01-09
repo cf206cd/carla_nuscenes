@@ -12,7 +12,7 @@ RadarBaseOptions: &RadarBaseOptions
   'range': '250'
   'sensor_tick': '0.076923'
 
-calibration:
+sensors:
   - 
     name: "CAM_FRONT"
     bp_name: 'sensor.camera.rgb'

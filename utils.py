@@ -3,15 +3,18 @@ import numpy as np
 import quaternion
 import json
 
+def transform_timestamp(timestamp):
+    return int(timestamp*10e6)
+
 def get_token(key,data):
-    obj = hashlib.md5(key.encode('utf-8'))
-    obj.update(data.encode('utf-8'))
+    obj = hashlib.md5(str(key).encode('utf-8'))
+    obj.update(str(data).encode('utf-8'))
     result = obj.hexdigest()
     return result
 
 def dump(data,path):
     with open(path, "w") as filedata:
-        json.dump(data, filedata)
+        json.dump(data, filedata, indent=0, separators=(',',':'))
 
 def load(path):
     with open(path, "r") as filedata:
@@ -29,10 +32,9 @@ def get_rt(transform):
         translation = [transform.location.x,
                         transform.location.y,
                         transform.location.z]
-        euler_angles = quaternion.as_euler_angles([transform.rotation.yaw,
+        quat = quaternion.from_euler_angles(np.array([transform.rotation.yaw,
                                                     transform.rotation.pitch,
                                                     transform.rotation.roll
-                                                    ])
-        quat = quaternion.from_euler_angels(euler_angles)
-        rotation = quaternion.as_float_array(quat)
+                                                    ]))
+        rotation = quaternion.as_float_array(quat).tolist()
         return rotation,translation

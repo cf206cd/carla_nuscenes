@@ -1,5 +1,8 @@
+collect_time: 3
+keyframe_time: 0.5
+
 dataset:
-  root: "./"
+  root: "./dataset"
   version: "v1.14"
   load: False
 
@@ -7,7 +10,7 @@ client:
   host: 127.0.0.1
   port: 2000
   time_out: 10.0
-  
+
 sensors:
   !include ./configs/sensors.yaml
 
@@ -17,9 +20,12 @@ categories:
 attributes:
   !include ./configs/attributes.yaml
 
+visibility:
+  !include ./configs/visibility.yaml 
+
 worlds:  #map
   - 
-    map_name: "Town01"
+    map_name: "Town03"
     map_category: "semantic_prior"
     settings:
       fixed_delta_seconds: 0.01 
@@ -28,7 +34,7 @@ worlds:  #map
         date: "2023-01-09"
         time: "10-45-20"
         timezone: "+0800"
-        vehicle: "n0003"
+        vehicle: "c0003"
         location: "chengdu"
         scenes:
           - 
@@ -64,10 +70,12 @@ worlds:  #map
                   x: -89.62303161621094
                   y: 16.47465705871582
                   z: 0.5999999642372131
-              vehicles:
-                !include ./configs/vehicles.yaml
-              walkers:
-                !include ./configs/walkers.yaml
-              calibrations:
-                !include ./configs/calibrations.yaml
+            vehicles:
+              !include ./configs/vehicles.yaml
+            walkers:
+              !include ./configs/walkers.yaml
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "test"
 

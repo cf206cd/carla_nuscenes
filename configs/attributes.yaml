@@ -1,0 +1,32 @@
+#---------------attributes---------------
+-
+  name: "vehicle.moving"
+  description: "Vehicle is moving."
+    
+-
+  name: "vehicle.stopped"
+  description: "Vehicle, with a driver/rider in/on it, is currently stationary but has an intent to move."
+
+-
+  name: "vehicle.parked"
+  description: "Vehicle is stationary (usually for longer duration) with no immediate intent to move."
+
+-
+  name: "cycle.with_rider"
+  description: "There is a rider on the bicycle or motorcycle."
+
+-
+  name: "cycle.without_rider"
+  description: "There is NO rider on the bicycle or motorcycle."
+
+-
+  name: "pedestrian.sitting_lying_down"
+  description: "The human is sitting or lying down."
+
+-
+  name: "pedestrian.standing"
+  description: "The human is standing."
+
+-
+  name: "pedestrian.moving"
+  description: "The human is moving."
