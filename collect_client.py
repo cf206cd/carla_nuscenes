@@ -8,12 +8,6 @@ class CollectClient:
     def __init__(self,client_config):
         self.client = carla.Client(client_config["host"],client_config["ip"])
         self.client.set_timeout(client_config["time_out"])
-        self.modality_dict = {
-            'sensor.camera.rgb':'camera',
-            'sensor.other.radar':'radar',
-            'sensor.lidar.ray_cast':'lidar'
-        }
-        
 
     def generate_world(self,world_config):
         self.client.load_world(world_config["map_name"])
@@ -82,7 +76,7 @@ class CollectClient:
         self.world.tick()
         for walker in self.walkers:
             walker.start()
-        self.sensors = [Sensor(world=self.world, attach_to=self.ego_vehicle.get_actor(), **sensor_config["init"]) for sensor_config in scene_config["sensors"]]
+        self.sensors = [Sensor(world=self.world, attach_to=self.ego_vehicle.get_actor(), **sensor_config["init"]) for sensor_config in scene_config["calibration"]]
         sensors_batch = [SpawnActor(sensor.blueprint,sensor.transform,sensor.attach_to) for sensor in self.sensors]
         for i,response in enumerate(self.client.apply_batch_sync(sensors_batch)):
             if not response.error:

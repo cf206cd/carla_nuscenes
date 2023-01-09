@@ -6,6 +6,7 @@ class Runner:
     def __init__(self,config_path):
         with open(config_path,'r') as f:
             self.config = yaml.load(f.read(),Loader=yaml.CLoader)
+        print(self.config)
         self.dataset = Dataset(**self.config["dataset"])
         self.collect_client = CollectClient(self.config["client"])
 
@@ -32,7 +33,7 @@ class Runner:
                 self.collect_client.destroy_world()    
 
     def add_one_scene(self):
-        pass
+        pass#todo
 
     def _add_one_scene(self,log_token,scene_id,scene_config):
         try:
@@ -68,6 +69,6 @@ class Runner:
                             samples_data_token[sensor.name] = self.dataset.update_sample_data(samples_data_token[sensor.name],calibrated_sensors_token[sensor.name],sample_token,ego_pose_token,is_key_frame)
                     for instance in self.collect_client.walkers+self.collect_client.vehicles:
                         if self.collect_client.is_invisible(self.collect_client.ego_vehicle.get_actor(),instance.get_actor()):
-                            self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.dataset.get_sample_annotation(scene_id,instance))
+                            self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_id,instance))
         finally:
             self.collect_client.destroy_scene()
