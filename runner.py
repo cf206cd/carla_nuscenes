@@ -77,6 +77,7 @@ class Runner:
                     for instance in self.collect_client.walkers+self.collect_client.vehicles:
                         print([p.label for p in self.collect_client.cast_ray(self.collect_client.ego_vehicle.get_actor(),instance.get_actor())])
                         if self.collect_client.cast_ray(self.collect_client.ego_vehicle.get_actor(),instance.get_actor()) == []:
-                            self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_id,instance))
+                            sample_annotation_token  = self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_id,instance))
+                            samples_annotation_token[instance.get_actor().id] = sample_annotation_token
         finally:
             self.collect_client.destroy_scene()
