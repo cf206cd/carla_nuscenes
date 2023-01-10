@@ -20,7 +20,8 @@ class CollectClient:
         self.vehicles = None
         self.walkers = None
 
-        self.category_dict = {bp.id: ".".split(bp.id)[0] for bp in self.world.get_blueprint_library()}
+        get_category = lambda bp: "vehicle.car" if ".".split(bp.id)[0] == "vehicle" else "human.pedestrian.adult" if ".".split(bp.id)[0] == "walker" else None
+        self.category_dict = {bp.id: get_category(bp) for bp in self.world.get_blueprint_library()}
 
         self.trafficmanager = self.client.get_trafficmanager()
         self.trafficmanager.set_synchronous_mode(True)

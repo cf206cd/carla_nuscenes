@@ -9,7 +9,6 @@ class Runner:
     def __init__(self,config_path):
         with open(config_path,'r') as f:
             self.config = yaml.load(f.read(),Loader=yaml.FullLoader)
-        print(self.config)
         self.dataset = Dataset(**self.config["dataset"])
         self.collect_client = CollectClient(self.config["client"])
 

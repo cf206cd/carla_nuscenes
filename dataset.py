@@ -251,10 +251,10 @@ class Dataset:
         sample_annotation_item["num_radar_pts"] = num_radar_pts
         instance_item  = self.get_item("instance",instance_token)
         if prev == "":
-            instance_item["first_annotation_token"] = instance_item["token"]
+            instance_item["first_annotation_token"] = sample_annotation_item["token"]
         else:
-            self.get_item("instance",prev)["next"] = instance_item["token"]
-        instance_item["last_annotation_token"] = instance_item["token"]
+            self.get_item("sample_annotation",prev)["next"] = sample_annotation_item["token"]
+        instance_item["last_annotation_token"] = sample_annotation_item["token"]
         instance_item["nbr_annotations"] += 1
         if self.get_item("sample_annotation",sample_annotation_item["token"]) is not None:
             self.data["sample_annotation"].remove(self.get_item("sample_annotation",sample_annotation_item["token"]))
