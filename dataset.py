@@ -180,9 +180,9 @@ class Dataset:
         self.data["sample_data"].append(sample_data_item)
         return sample_data_item["token"]
 
-    def update_ego_pose(self,scene_token,timestamp,translation,rotation):
+    def update_ego_pose(self,scene_token,calibrated_sensor_token,timestamp,translation,rotation):
         ego_pose_item = {}
-        ego_pose_item["token"] = get_token("ego_pose",scene_token+str(timestamp))
+        ego_pose_item["token"] = get_token("ego_pose",scene_token+calibrated_sensor_token+str(timestamp))
         ego_pose_item["timestamp"] = timestamp
         ego_pose_item["rotation"] = rotation
         ego_pose_item["translation"] = translation
@@ -219,6 +219,7 @@ class Dataset:
         if self.get_item("category",category_item["token"]) is not None:
             self.data["category"].remove(self.get_item("category",category_item["token"]))
         self.data["category"].append(category_item)
+        print(category_item["token"])
         return category_item["token"]
 
     def update_instance(self,category_token,id):

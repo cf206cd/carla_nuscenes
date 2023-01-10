@@ -20,7 +20,7 @@ class CollectClient:
         self.vehicles = None
         self.walkers = None
 
-        get_category = lambda bp: "vehicle.car" if ".".split(bp.id)[0] == "vehicle" else "human.pedestrian.adult" if ".".split(bp.id)[0] == "walker" else None
+        get_category = lambda bp: "vehicle.car" if bp.id.split(".")[0] == "vehicle" else "human.pedestrian.adult" if ".".split(bp.id)[0] == "walker" else None
         self.category_dict = {bp.id: get_category(bp) for bp in self.world.get_blueprint_library()}
 
         self.trafficmanager = self.client.get_trafficmanager()
@@ -155,7 +155,7 @@ class CollectClient:
         return (transform_timestamp(self.world.get_snapshot().timestamp.elapsed_seconds),)
 
     def get_instance(self,scene_id,instance):
-        category_token = get_token("category",self.category_dict[instance.bp_name])
+        category_token = get_token("category",self.category_dict[instance.blueprint.id])
         id = hash((scene_id,instance.get_actor().id))
         return category_token,id
 

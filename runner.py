@@ -68,7 +68,7 @@ class Runner:
                     for sensor in self.collect_client.sensors:
                         if sensor.bp_name in ['sensor.camera.rgb','sensor.other.radar','sensor.lidar.ray_cast']:
                             for idx,sample_data in enumerate(sensor.get_data_list()):
-                                ego_pose_token = self.dataset.update_ego_pose(scene_token,*self.collect_client.get_ego_pose(sample_data))
+                                ego_pose_token = self.dataset.update_ego_pose(scene_token,calibrated_sensors_token[sensor.name],*self.collect_client.get_ego_pose(sample_data))
                                 is_key_frame = False
                                 if idx == len(sensor.get_data_list())-1:
                                     is_key_frame = True
@@ -77,7 +77,6 @@ class Runner:
                     for instance in self.collect_client.walkers+self.collect_client.vehicles:
                         print([p.label for p in self.collect_client.cast_ray(self.collect_client.ego_vehicle.get_actor(),instance.get_actor())])
                         if self.collect_client.cast_ray(self.collect_client.ego_vehicle.get_actor(),instance.get_actor()) == []:
-                            sample_annotation_token  = self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_id,instance))
-                            samples_annotation_token[instance.get_actor().id] = sample_annotation_token
+                            samples_annotation_token[instance.get_actor().id]  = self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_id,instance))
         finally:
             self.collect_client.destroy_scene()
