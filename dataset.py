@@ -113,7 +113,7 @@ class Dataset:
         calibrated_sensor_item["sensor_token"] = sensor_token
         calibrated_sensor_item["translation"] = translation
         calibrated_sensor_item["rotation"] = rotation
-        calibrated_sensor_item["intrinsic"] = intrinsic
+        calibrated_sensor_item["camera_intrinsic"] = intrinsic
         if self.get_item("calibrated_sensor",calibrated_sensor_item["token"]) is not None:
             self.data["calibrated_sensor"].remove(self.get_item("calibrated_sensor",calibrated_sensor_item["token"]))
         self.data["calibrated_sensor"].append(calibrated_sensor_item)
