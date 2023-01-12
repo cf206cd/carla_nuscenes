@@ -8,13 +8,17 @@ def parse_image(image):
     array = np.reshape(array, (image.height, image.width, 4))
     return array
 
-def parse_lidar_data(lidar_data):
-    points = np.frombuffer(lidar_data.raw_data, dtype=np.dtype('f4'))
-    points = points.copy()
-    points = np.reshape(points, (int(points.shape[0] / 4), 4))
-    tmp = np.zeros((points.shape[0], 1))
-    points = np.append(points, tmp, axis = 1)
-    return points
+def parse_lidar_data(lidar_data):#to check
+    points = []
+    current_channel = 0
+    end_idx = lidar_data.get_point_count(current_channel)
+    for idx,data in enumerate(lidar_data):
+        point = [data.point.x,data.point.y,data.point.z,data.intensity,current_channel]
+        if idx==end_idx:
+            current_channel+=1
+            end_idx+=lidar_data.get_point_count(current_channel)
+        points.append(point)
+    return np.array(points)
 
 def parse_radar_data(radar_data):
     points = np.frombuffer(radar_data.raw_data, dtype=np.dtype('f4'))
@@ -52,3 +56,6 @@ class Sensor(Actor):
 
     def add_data(self,data):
         self.data_list.append((self.actor.parent.get_transform(),data))
+
+    def get_transform(self):
+        return self.actor.get_transform()

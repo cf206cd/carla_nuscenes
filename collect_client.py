@@ -2,6 +2,7 @@ import carla
 from sensor import *
 from vehicle import Vehicle
 from walker import Walker
+import math
 from utils import get_token,get_nuscenes_rt,get_intrinsic,transform_timestamp
     
 class CollectClient:
@@ -22,6 +23,8 @@ class CollectClient:
 
         get_category = lambda bp: "vehicle.car" if bp.id.split(".")[0] == "vehicle" else "human.pedestrian.adult" if bp.id.split(".")[0] == "walker" else None
         self.category_dict = {bp.id: get_category(bp) for bp in self.world.get_blueprint_library()}
+        get_attribute = lambda bp: ["vehicle.moving"] if bp.id.split(".")[0] == "vehicle" else ["pedestrian.moving"] if bp.id.split(".")[0] == "walker" else None
+        self.attribute_dict = {bp.id: get_attribute(bp) for bp in self.world.get_blueprint_library()}
 
         self.trafficmanager = self.client.get_trafficmanager()
         self.trafficmanager.set_synchronous_mode(True)
@@ -123,7 +126,7 @@ class CollectClient:
         target_bbox_center = target.get_location()
         points =  self.world.cast_ray(ego_bbox_center,target_bbox_center)
         points = list(filter(lambda point:not ego.bounding_box.contains(point.location,ego.get_transform()) 
-                            and not target.bounding_box.contains(point.location,target.get_transform()),points))
+                            and not target.bounding_box.contains(point.location,target.get_transform()) and point.label is not "",points))
         return points
 
     def get_calibrated_sensor(self,sensor):
@@ -161,19 +164,40 @@ class CollectClient:
         id = hash((scene_id,instance.get_actor().id))
         return category_token,id
 
-    def get_sample_annotation(self,scene_id,instance):
+    def get_sample_annotation(self,scene_id,instance,lidar_data,lidar_transform,radar_data,radar_transform):
         instance_token = get_token("instance",hash((scene_id,instance.get_actor().id)))
         visibility_token = str(self.get_visibility(instance))
         attribute_tokens = [get_token("attribute",attribute) for attribute in self.get_attributes(instance)]
         rotation,translation = get_nuscenes_rt(instance.get_transform())
         size = [instance.get_size().y,instance.get_size().x,instance.get_size().z]
-        num_lidar_pts = 4#todo
-        num_radar_pts = 4#todo
+        num_lidar_pts = self.get_num_lidar_pts(instance,lidar_data,lidar_transform)
+        num_radar_pts = self.get_num_radar_pts(instance,radar_data,radar_transform)
         return instance_token,visibility_token,attribute_tokens,translation,rotation,size,num_lidar_pts,num_radar_pts
 
-
-    def get_visibility(self,visibility):
+    def get_visibility(self,instance):
         return 4#todo
 
     def get_attributes(self,instance):
-        return ["vehicle.parked"]#todo
+        return self.attribute_dict[instance.bp_name]
+
+    def get_num_lidar_pts(self,instance,lidar_data,lidar_transform):#to check
+        num_lidar_pts = 0
+        if lidar_data is not None:
+            for data in lidar_data[1]:
+                if instance.get_actor().bounding_box.contains(lidar_transform.transform(data.point),instance.get_transform()):
+                    num_lidar_pts+=1
+        return num_lidar_pts
+
+    def get_num_radar_pts(self,instance,radar_data,radar_transform):#to check
+        num_radar_pts = 0
+        if radar_data is not None:
+            for data in radar_data[1]:
+                point = carla.Location(data.depth*math.cos(data.altitude)*math.cos(data.azimuth),
+                        data.depth*math.sin(data.altitude)*math.cos(data.azimuth),
+                        data.depth*math.sin(data.azimuth)
+                        )
+                if instance.get_actor().bounding_box.contains(radar_transform.transform(point),instance.get_transform()):
+                    num_radar_pts+=1
+        return num_radar_pts
+
+    

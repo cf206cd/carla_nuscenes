@@ -172,7 +172,7 @@ sensors:
     location: 
       x: 0
       y: 0
-      z: 1.5
+      z: 1.8
     rotation:
       yaw: 90
       pitch: 0
@@ -184,7 +184,6 @@ sensors:
       'upper_fov': '10'
       'lower_fov': '-30'
       'horizontal_fov': '360'
-      'rotation_frequency': '20'
       'sensor_tick': '0.05'
   #-----------gnss----------
   - 
