@@ -28,13 +28,29 @@ def get_intrinsic(fov, image_size_x,image_size_y):
     K[1, 2] = image_size_y / 2.0
     return K
 
-def get_rt(transform):
-        translation = [transform.location.x,
-                        transform.location.y,
-                        transform.location.z]
-        quat = quaternion.from_euler_angles(np.array([transform.rotation.yaw,
-                                                    transform.rotation.pitch,
-                                                    transform.rotation.roll
-                                                    ]))
-        rotation = quaternion.as_float_array(quat).tolist()
-        return rotation,translation
+def get_nuscenes_rt(transform,mode=None):
+    translation = [transform.location.x,
+                -transform.location.y,
+                transform.location.z]
+    if mode == "zxy":
+        rotation_matrix1 = np.array([
+            [0,0,1],
+            [1,0,0],
+            [0,-1,0]
+        ])
+    else:
+        rotation_matrix1 = np.array([
+            [1,0,0],
+            [0,-1,0],
+            [0,0,1]
+        ])
+
+    rotation_matrix2 = np.array(transform.get_matrix())[:3,:3]
+    rotation_matrix3 = np.array([
+            [1,0,0],
+            [0,-1,0],
+            [0,0,1]
+        ])
+    rotation_matrix = rotation_matrix3@rotation_matrix2@rotation_matrix1
+    quat = quaternion.as_float_array(quaternion.from_rotation_matrix(rotation_matrix)).tolist()
+    return quat,translation

@@ -219,7 +219,6 @@ class Dataset:
         if self.get_item("category",category_item["token"]) is not None:
             self.data["category"].remove(self.get_item("category",category_item["token"]))
         self.data["category"].append(category_item)
-        print(category_item["token"])
         return category_item["token"]
 
     def update_instance(self,category_token,id):

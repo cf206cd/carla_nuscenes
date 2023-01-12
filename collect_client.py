@@ -2,7 +2,7 @@ import carla
 from sensor import *
 from vehicle import Vehicle
 from walker import Walker
-from utils import get_token,get_rt,get_intrinsic,transform_timestamp
+from utils import get_token,get_nuscenes_rt,get_intrinsic,transform_timestamp
     
 class CollectClient:
     def __init__(self,client_config):
@@ -129,26 +129,28 @@ class CollectClient:
     def get_calibrated_sensor(self,sensor):
         sensor_token = get_token("sensor",sensor.name)
         channel = sensor.name
-        rotation,translation = get_rt(sensor.transform)
+        print(channel)
         if sensor.bp_name == "sensor.camera.rgb":
             intrinsic = get_intrinsic(float(sensor.get_actor().attributes["fov"]),
                             float(sensor.get_actor().attributes["image_size_x"]),
                             float(sensor.get_actor().attributes["image_size_y"])).tolist()
+            rotation,translation = get_nuscenes_rt(sensor.transform,"zxy")
         else:
             intrinsic = []
+            rotation,translation = get_nuscenes_rt(sensor.transform)
         return sensor_token,channel,translation,rotation,intrinsic
         
     def get_ego_pose(self,sample_data):
         timestamp = transform_timestamp(sample_data[1].timestamp)
-        rotation,translation = get_rt(sample_data[0])
+        rotation,translation = get_nuscenes_rt(sample_data[0])
         return timestamp,translation,rotation
     
     def get_sample_data(self,sample_data):
         height = 0
-        width = 0 
-        if isinstance(sample_data,carla.Image):
-            height = sample_data.height
-            width = sample_data.width
+        width = 0
+        if isinstance(sample_data[1],carla.Image):
+            height = sample_data[1].height
+            width = sample_data[1].width
         return sample_data,height,width
 
     def get_sample(self):
@@ -163,8 +165,8 @@ class CollectClient:
         instance_token = get_token("instance",hash((scene_id,instance.get_actor().id)))
         visibility_token = str(self.get_visibility(instance))
         attribute_tokens = [get_token("attribute",attribute) for attribute in self.get_attributes(instance)]
-        rotation,translation = get_rt(instance.get_transform())
-        size = [instance.get_size().x,instance.get_size().y,instance.get_size().z]
+        rotation,translation = get_nuscenes_rt(instance.get_transform())
+        size = [instance.get_size().y,instance.get_size().x,instance.get_size().z]
         num_lidar_pts = 4#todo
         num_radar_pts = 4#todo
         return instance_token,visibility_token,attribute_tokens,translation,rotation,size,num_lidar_pts,num_radar_pts

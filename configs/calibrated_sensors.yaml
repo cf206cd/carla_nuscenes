@@ -146,7 +146,7 @@ sensors:
       y: 0.86
       z: 1
     rotation:
-      yaw: 90
+      yaw: 180
       pitch: 0
       roll: 0
     options: 
@@ -159,7 +159,7 @@ sensors:
       y: -0.86
       z: 1
     rotation:
-      yaw: -90
+      yaw: 180
       pitch: 0
       roll: 0
     options: 
@@ -174,7 +174,7 @@ sensors:
       y: 0
       z: 1.5
     rotation:
-      yaw: 0
+      yaw: 90
       pitch: 0
       roll: 0
     options: 
