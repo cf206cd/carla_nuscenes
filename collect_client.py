@@ -20,7 +20,7 @@ class CollectClient:
         self.vehicles = None
         self.walkers = None
 
-        get_category = lambda bp: "vehicle.car" if bp.id.split(".")[0] == "vehicle" else "human.pedestrian.adult" if ".".split(bp.id)[0] == "walker" else None
+        get_category = lambda bp: "vehicle.car" if bp.id.split(".")[0] == "vehicle" else "human.pedestrian.adult" if bp.id.split(".")[0] == "walker" else None
         self.category_dict = {bp.id: get_category(bp) for bp in self.world.get_blueprint_library()}
 
         self.trafficmanager = self.client.get_trafficmanager()
