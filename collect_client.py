@@ -164,9 +164,9 @@ class CollectClient:
         num_lidar_pts = 0
         num_radar_pts = 0
         for sensor in self.sensors:
-            if sensor.bp_name == 'sensor.other.radar':
+            if sensor.bp_name == 'sensor.lidar.ray_cast':
                 num_lidar_pts += self.get_num_lidar_pts(instance,sensor.get_last_data(),sensor.get_transform())
-            elif sensor.bp_name == 'sensor.lidar.ray_cast':
+            elif sensor.bp_name == 'sensor.other.radar':
                 num_radar_pts += self.get_num_radar_pts(instance,sensor.get_last_data(),sensor.get_transform())
         return instance_token,visibility_token,attribute_tokens,translation,rotation,size,num_lidar_pts,num_radar_pts
 
