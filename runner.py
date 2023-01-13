@@ -65,6 +65,7 @@ class Runner:
             radar_data = None
             radar_transform = None
             for count in range(int(self.config["collect_time"]/self.collect_client.settings.fixed_delta_seconds)):
+                print("count:",count)
                 self.collect_client.tick()
                 if (count+1)%int(self.config["keyframe_time"]/self.collect_client.settings.fixed_delta_seconds) == 0:
                     sample_token = self.dataset.update_sample(sample_token,scene_token,*self.collect_client.get_sample())
@@ -84,7 +85,7 @@ class Runner:
                                 samples_data_token[sensor.name] = self.dataset.update_sample_data(samples_data_token[sensor.name],calibrated_sensors_token[sensor.name],sample_token,ego_pose_token,is_key_frame,*self.collect_client.get_sample_data(sample_data))
 
                     for instance in self.collect_client.walkers+self.collect_client.vehicles:
-                        if self.collect_client.cast_ray(self.collect_client.ego_vehicle.get_actor(),instance.get_actor()) == []:
+                        if self.collect_client.get_visibility != 0:
                             samples_annotation_token[instance.get_actor().id]  = self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_id,instance,lidar_data,lidar_transform,radar_data,radar_transform))
                     
                     for sensor in self.collect_client.sensors:

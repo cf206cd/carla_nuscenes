@@ -170,7 +170,6 @@ class Dataset:
         sample_data_item["prev"] = prev
         sample_data_item["next"] = ""
         filename = self.get_filename(sample_data_item)
-        print("filename",filename)
         #save_data(sample_data[1],os.path.join(self.root,filename))
         sample_data_item["filename"] = filename
         if prev != "":

@@ -121,18 +121,9 @@ class CollectClient:
         self.walkers = None
         self.world.apply_settings(self.original_settings)
 
-    def cast_ray(self,ego,target):
-        ego_bbox_center = ego.get_location()
-        target_bbox_center = target.get_location()
-        points =  self.world.cast_ray(ego_bbox_center,target_bbox_center)
-        points = list(filter(lambda point:not ego.bounding_box.contains(point.location,ego.get_transform()) 
-                            and not target.bounding_box.contains(point.location,target.get_transform()) and point.label is not "",points))
-        return points
-
     def get_calibrated_sensor(self,sensor):
         sensor_token = get_token("sensor",sensor.name)
         channel = sensor.name
-        print(channel)
         if sensor.bp_name == "sensor.camera.rgb":
             intrinsic = get_intrinsic(float(sensor.get_actor().attributes["fov"]),
                             float(sensor.get_actor().attributes["image_size_x"]),
@@ -174,18 +165,26 @@ class CollectClient:
         num_radar_pts = self.get_num_radar_pts(instance,radar_data,radar_transform)
         return instance_token,visibility_token,attribute_tokens,translation,rotation,size,num_lidar_pts,num_radar_pts
 
-    def get_visibility(self,instance):
-        return 4#todo
+    def get_visibility(self,instance):#todo
+        instance_bbox = instance.get_bbox()
+        print(instance_bbox)
+        points =  self.world.cast_ray(ego_bbox_center,target_bbox_center)
+        points = list(filter(lambda point:not ego.bounding_box.contains(point.location,ego.get_transform()) 
+                            and not target.bounding_box.contains(point.location,target.get_transform()) and point.label is not "",points))
+        
+        return 4
 
     def get_attributes(self,instance):
         return self.attribute_dict[instance.bp_name]
 
-    def get_num_lidar_pts(self,instance,lidar_data,lidar_transform):#to check
+    def get_num_lidar_pts(self,instance,lidar_data,lidar_transform):
         num_lidar_pts = 0
         if lidar_data is not None:
             for data in lidar_data[1]:
-                if instance.get_actor().bounding_box.contains(lidar_transform.transform(data.point),instance.get_transform()):
+                point = lidar_transform.transform(data.point)
+                if instance.get_actor().bounding_box.contains(point,instance.get_actor().get_transform()):
                     num_lidar_pts+=1
+        print("num_lidar_pts",num_lidar_pts)
         return num_lidar_pts
 
     def get_num_radar_pts(self,instance,radar_data,radar_transform):#to check
@@ -196,8 +195,9 @@ class CollectClient:
                         data.depth*math.sin(data.altitude)*math.cos(data.azimuth),
                         data.depth*math.sin(data.azimuth)
                         )
-                if instance.get_actor().bounding_box.contains(radar_transform.transform(point),instance.get_transform()):
+                if instance.get_actor().bounding_box.contains(radar_transform.transform(point),instance.get_actor().get_transform()):
                     num_radar_pts+=1
+        print("num_radar_pts",num_radar_pts)
         return num_radar_pts
 
     
