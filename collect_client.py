@@ -201,7 +201,6 @@ class CollectClient:
                 point = lidar_transform.transform(data.point)
                 if instance.get_actor().bounding_box.contains(point,instance.get_actor().get_transform()):
                     num_lidar_pts+=1
-        print("num_lidar_pts",num_lidar_pts)
         return num_lidar_pts
 
     def get_num_radar_pts(self,instance,radar_data,radar_transform):#to check

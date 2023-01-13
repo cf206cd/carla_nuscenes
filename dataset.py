@@ -170,7 +170,8 @@ class Dataset:
         sample_data_item["prev"] = prev
         sample_data_item["next"] = ""
         filename = self.get_filename(sample_data_item)
-        #save_data(sample_data[1],os.path.join(self.root,filename))
+        print("save file:",filename)
+        save_data(sample_data[1],os.path.join(self.root,filename))
         sample_data_item["filename"] = filename
         if prev != "":
             self.get_item("sample_data",prev)["next"] = ego_pose_token
