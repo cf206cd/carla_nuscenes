@@ -160,24 +160,29 @@ class CollectClient:
         visibility_token = str(self.get_visibility(instance))
         attribute_tokens = [get_token("attribute",attribute) for attribute in self.get_attributes(instance)]
         rotation,translation = get_nuscenes_rt(instance.get_transform())
-        size = [instance.get_size().y,instance.get_size().x,instance.get_size().z]
+        size = [instance.get_size().y,instance.get_size().x,instance.get_size().z]#xyz to whl
         num_lidar_pts = self.get_num_lidar_pts(instance,lidar_data,lidar_transform)
         num_radar_pts = self.get_num_radar_pts(instance,radar_data,radar_transform)
         return instance_token,visibility_token,attribute_tokens,translation,rotation,size,num_lidar_pts,num_radar_pts
 
-    def get_visibility(self,instance):#todo
-        instance_bbox = instance.get_bbox()
-        print(instance_bbox)
-        points =  self.world.cast_ray(ego_bbox_center,target_bbox_center)
-        points = list(filter(lambda point:not ego.bounding_box.contains(point.location,ego.get_transform()) 
-                            and not target.bounding_box.contains(point.location,target.get_transform()) and point.label is not "",points))
-        
-        return 4
+    def get_visibility(self,instance):#to check
+        ego_position = self.ego_vehicle.get_transform().location
+        instance_position = instance.get_transform().location
+        visible_point_count = 0
+        for i in range(5):
+            check_point = instance_position-(i-2)*instance.get_size()*0.5
+            ray_points =  self.world.cast_ray(ego_position,check_point)
+            points = list(filter(lambda point:not self.ego_vehicle.get_actor().bounding_box.contains(point.location,self.ego_vehicle.get_actor().get_transform()) 
+                                and not instance.get_actor().bounding_box.contains(point.location,instance.get_actor().get_transform()) and point.label is not "",ray_points))
+            if points != []:
+                visible_point_count+=1
+        visibility_dict = {0:0,1:1,2:1,3:2,4:3,5:4}
+        return visibility_dict[visible_point_count]
 
     def get_attributes(self,instance):
         return self.attribute_dict[instance.bp_name]
 
-    def get_num_lidar_pts(self,instance,lidar_data,lidar_transform):
+    def get_num_lidar_pts(self,instance,lidar_data,lidar_transform):#to check
         num_lidar_pts = 0
         if lidar_data is not None:
             for data in lidar_data[1]:
