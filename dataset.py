@@ -271,4 +271,3 @@ class Dataset:
         name = log_file+"_"+channel+"_"+str(sample_data_item["timestamp"])+"."+sample_data_item["fileformat"]
         filename = os.path.join(dir,channel,name)
         return filename
-        

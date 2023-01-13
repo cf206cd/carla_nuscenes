@@ -52,7 +52,7 @@ class Sensor(Actor):
         self.actor.listen(self.add_data)
 
     def get_last_data(self):
-        return self.data_list
+        return self.data_list[-1]
 
     def add_data(self,data):
         self.data_list.append((self.actor.parent.get_transform(),data))
