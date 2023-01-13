@@ -205,7 +205,7 @@ class CollectClient:
     def get_attributes(self,instance):
         return self.attribute_dict[instance.bp_name]
 
-    def get_num_lidar_pts(self,instance,lidar_data,lidar_transform):#to check
+    def get_num_lidar_pts(self,instance,lidar_data,lidar_transform):
         num_lidar_pts = 0
         if lidar_data is not None:
             for data in lidar_data[1]:
@@ -214,7 +214,7 @@ class CollectClient:
                     num_lidar_pts+=1
         return num_lidar_pts
 
-    def get_num_radar_pts(self,instance,radar_data,radar_transform):#to check
+    def get_num_radar_pts(self,instance,radar_data,radar_transform):
         num_radar_pts = 0
         if radar_data is not None:
             for data in radar_data[1]:
