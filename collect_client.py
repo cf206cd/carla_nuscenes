@@ -169,7 +169,6 @@ class CollectClient:
         ego_position = self.ego_vehicle.get_transform().location
         ego_position.z += self.ego_vehicle.get_size().z*0.5
         instance_position = instance.get_transform().location
-        instance_position.z += instance.get_size().z*0.5
         visible_point_count1 = 0
         visible_point_count2 = 0
         for i in range(5):
