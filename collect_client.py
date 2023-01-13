@@ -170,11 +170,14 @@ class CollectClient:
         instance_position = instance.get_transform().location
         visible_point_count = 0
         for i in range(5):
-            check_point = instance_position-(i-2)*instance.get_size()*0.5
+            size = instance.get_size()
+            size.z = 0
+            check_point = instance_position-(i-2)*size*0.5
             ray_points =  self.world.cast_ray(ego_position,check_point)
             points = list(filter(lambda point:not self.ego_vehicle.get_actor().bounding_box.contains(point.location,self.ego_vehicle.get_actor().get_transform()) 
-                                and not instance.get_actor().bounding_box.contains(point.location,instance.get_actor().get_transform()) and point.label is not "",ray_points))
-            if points != []:
+                                and not instance.get_actor().bounding_box.contains(point.location,instance.get_actor().get_transform()) 
+                                and point.label is not carla.libcarla.CityObjectLabel.NONE,ray_points))
+            if not points:
                 visible_point_count+=1
         visibility_dict = {0:0,1:1,2:1,3:2,4:3,5:4}
         return visibility_dict[visible_point_count]
