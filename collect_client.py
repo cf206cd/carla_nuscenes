@@ -165,20 +165,29 @@ class CollectClient:
         num_radar_pts = self.get_num_radar_pts(instance,radar_data,radar_transform)
         return instance_token,visibility_token,attribute_tokens,translation,rotation,size,num_lidar_pts,num_radar_pts
 
-    def get_visibility(self,instance):#to check
+    def get_visibility(self,instance):
         ego_position = self.ego_vehicle.get_transform().location
         instance_position = instance.get_transform().location
-        visible_point_count = 0
+        visible_point_count1 = 0
+        visible_point_count2 = 0
+        size = instance.get_size()
         for i in range(5):
-            size = instance.get_size()
-            size.z = 0
             check_point = instance_position-(i-2)*size*0.5
             ray_points =  self.world.cast_ray(ego_position,check_point)
             points = list(filter(lambda point:not self.ego_vehicle.get_actor().bounding_box.contains(point.location,self.ego_vehicle.get_actor().get_transform()) 
                                 and not instance.get_actor().bounding_box.contains(point.location,instance.get_actor().get_transform()) 
                                 and point.label is not carla.libcarla.CityObjectLabel.NONE,ray_points))
             if not points:
-                visible_point_count+=1
+                visible_point_count1+=1
+            size.x = -size.x
+            check_point = instance_position-(i-2)*size*0.5
+            ray_points =  self.world.cast_ray(ego_position,check_point)
+            points = list(filter(lambda point:not self.ego_vehicle.get_actor().bounding_box.contains(point.location,self.ego_vehicle.get_actor().get_transform()) 
+                                and not instance.get_actor().bounding_box.contains(point.location,instance.get_actor().get_transform()) 
+                                and point.label is not carla.libcarla.CityObjectLabel.NONE,ray_points))
+            if not points:
+                visible_point_count2+=1
+        visible_point_count = max(visible_point_count1,visible_point_count2)
         visibility_dict = {0:0,1:1,2:1,3:2,4:3,5:4}
         return visibility_dict[visible_point_count]
 
