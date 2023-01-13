@@ -173,6 +173,7 @@ class CollectClient:
         size = instance.get_size()
         for i in range(5):
             check_point = instance_position-(i-2)*size*0.5
+            size.z = 0
             ray_points =  self.world.cast_ray(ego_position,check_point)
             points = list(filter(lambda point:not self.ego_vehicle.get_actor().bounding_box.contains(point.location,self.ego_vehicle.get_actor().get_transform()) 
                                 and not instance.get_actor().bounding_box.contains(point.location,instance.get_actor().get_transform()) 
