@@ -155,14 +155,19 @@ class CollectClient:
         id = hash((scene_id,instance.get_actor().id))
         return category_token,id
 
-    def get_sample_annotation(self,scene_id,instance,lidar_data,lidar_transform,radar_data,radar_transform):
+    def get_sample_annotation(self,scene_id,instance):
         instance_token = get_token("instance",hash((scene_id,instance.get_actor().id)))
         visibility_token = str(self.get_visibility(instance))
         attribute_tokens = [get_token("attribute",attribute) for attribute in self.get_attributes(instance)]
         rotation,translation = get_nuscenes_rt(instance.get_transform())
         size = [instance.get_size().y,instance.get_size().x,instance.get_size().z]#xyz to whl
-        num_lidar_pts = self.get_num_lidar_pts(instance,lidar_data,lidar_transform)
-        num_radar_pts = self.get_num_radar_pts(instance,radar_data,radar_transform)
+        num_lidar_pts = 0
+        num_radar_pts = 0
+        for sensor in self.sensors:
+            if sensor.bp_name == 'sensor.other.radar':
+                num_lidar_pts += self.get_num_lidar_pts(instance,sensor.get_last_data(),sensor.get_transform())
+            elif sensor.bp_name == 'sensor.lidar.ray_cast':
+                num_radar_pts += self.get_num_radar_pts(instance,sensor.get_last_data(),sensor.get_transform())
         return instance_token,visibility_token,attribute_tokens,translation,rotation,size,num_lidar_pts,num_radar_pts
 
     def get_visibility(self,instance):

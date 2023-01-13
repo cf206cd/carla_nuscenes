@@ -60,10 +60,6 @@ class Runner:
                 samples_data_token[sensor.name] = ""
 
             sample_token = ""
-            lidar_data = None
-            lidar_transform = None
-            radar_data = None
-            radar_transform = None
             for count in range(int(self.config["collect_time"]/self.collect_client.settings.fixed_delta_seconds)):
                 print("count:",count)
                 self.collect_client.tick()
@@ -76,17 +72,11 @@ class Runner:
                                 is_key_frame = False
                                 if idx == len(sensor.get_data_list())-1:
                                     is_key_frame = True
-                                    if sensor.bp_name == "sensor.lidar.ray_cast":
-                                        lidar_data = sample_data
-                                        lidar_transform = sensor.get_transform()
-                                    if sensor.bp_name == "sensor.other.radar":
-                                        radar_data = sample_data
-                                        radar_transform = sensor.get_transform()
                                 samples_data_token[sensor.name] = self.dataset.update_sample_data(samples_data_token[sensor.name],calibrated_sensors_token[sensor.name],sample_token,ego_pose_token,is_key_frame,*self.collect_client.get_sample_data(sample_data))
 
                     for instance in self.collect_client.walkers+self.collect_client.vehicles:
                         if self.collect_client.get_visibility(instance) > 0:
-                            samples_annotation_token[instance.get_actor().id]  = self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_id,instance,lidar_data,lidar_transform,radar_data,radar_transform))
+                            samples_annotation_token[instance.get_actor().id]  = self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_id,instance))
                     
                     for sensor in self.collect_client.sensors:
                         sensor.get_data_list().clear()
