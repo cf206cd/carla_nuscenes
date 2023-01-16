@@ -17,7 +17,7 @@ sensors:
     name: "CAM_FRONT"
     bp_name: 'sensor.camera.rgb'
     location: 
-      x: 0.8
+      x: 1.5
       y: 0
       z: 1.5
     rotation:
@@ -31,8 +31,8 @@ sensors:
     name: "CAM_FRONT_RIGHT"
     bp_name: 'sensor.camera.rgb'
     location: 
-      x: 0.8
-      y: 0.5
+      x: 1.5
+      y: 0.7
       z: 1.5
     rotation:
       yaw: 55
@@ -45,8 +45,8 @@ sensors:
     name: "CAM_FRONT_LEFT"
     bp_name: 'sensor.camera.rgb'
     location: 
-      x: 0.8
-      y: -0.5
+      x: 1.5
+      y: -0.7
       z: 1.5
     rotation:
       yaw: -55
@@ -59,8 +59,8 @@ sensors:
     name: "CAM_BACK_LEFT"
     bp_name: 'sensor.camera.rgb'
     location: 
-      x: -0.5
-      y: -0.5
+      x: -0.7
+      y: 0
       z: 1.5
     rotation:
       yaw: -110
@@ -73,7 +73,7 @@ sensors:
     name: "CAM_BACK"
     bp_name: 'sensor.camera.rgb'
     location: 
-      x: -0.5
+      x: -1.5
       y: 0
       z: 1.5
     rotation:
@@ -87,7 +87,7 @@ sensors:
     name: "CAM_BACK_RIGHT"
     bp_name: 'sensor.camera.rgb'
     location: 
-      x: -0.5
+      x: -0.7
       y: 0
       z: 1.5
     rotation:
@@ -102,9 +102,9 @@ sensors:
     name: "RADAR_FRONT"
     bp_name: 'sensor.other.radar'
     location: 
-      x: 2.04
+      x: 1.5
       y: 0
-      z: 1
+      z: 0
     rotation:
       yaw: 0
       pitch: 0
@@ -115,9 +115,9 @@ sensors:
     name: "RADAR_FRONT_RIGHT"
     bp_name: 'sensor.other.radar'
     location: 
-      x: 1.8
-      y: 0.86
-      z: 1
+      x: 1.5
+      y: 0.7
+      z: 0
     rotation:
       yaw: 90
       pitch: 0
@@ -129,9 +129,9 @@ sensors:
     name: "RADAR_FRONT_LEFT"
     bp_name: 'sensor.other.radar'
     location: 
-      x: 1.8
-      y: -0.86
-      z: 1
+      x: 1.5
+      y: -0.7
+      z: 0
     rotation:
       yaw: -90
       pitch: 0
@@ -142,9 +142,9 @@ sensors:
     name: "RADAR_BACK_RIGHT"
     bp_name: 'sensor.other.radar'
     location: 
-      x: -1.8
-      y: 0.86
-      z: 1
+      x: -1.5
+      y: 0.7
+      z: 0
     rotation:
       yaw: 180
       pitch: 0
@@ -155,9 +155,9 @@ sensors:
     name: "RADAR_BACK_LEFT"
     bp_name: 'sensor.other.radar'
     location: 
-      x: -1.8
-      y: -0.86
-      z: 1
+      x: -1.5
+      y: -0.7
+      z: 0
     rotation:
       yaw: 180
       pitch: 0
@@ -172,7 +172,7 @@ sensors:
     location: 
       x: 0
       y: 0
-      z: 1.8
+      z: 2
     rotation:
       yaw: 90
       pitch: 0
@@ -193,7 +193,7 @@ sensors:
     location: 
       x: 0
       y: 0
-      z: 1.5
+      z: 0
     rotation:
       yaw: 0
       pitch: 0
@@ -204,9 +204,9 @@ sensors:
     name: "IMU"
     bp_name: 'sensor.other.imu'
     location: 
-      x: 0
+      x: -0.7
       y: 0
-      z: 1.5
+      z: 0
     rotation:
       yaw: 0
       pitch: 0
