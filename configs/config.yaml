@@ -33,9 +33,10 @@ worlds:  #map
         timezone: "+0800"
         capture_vehicle: "c0003"
         location: "chengdu"
-        collect_time: 30
         scenes:
           - 
+            collect_time: 30
+            keyframe_time: 0.5
             weather_mode: "custom"
             weather:
               cloudiness: 0 # Values range from 0 to 100, being 0 a clear sky and 100 one completely covered with clouds.
