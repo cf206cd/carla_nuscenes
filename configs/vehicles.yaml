@@ -1,11 +1,11 @@
 - 
-  bp_name: "vehicle.yamaha.yzf"
+  bp_name: "vehicle.tesla.model3"
   location:
     x: -70.25457000732422
     y: 27.96375846862793
     z: 0.5999999642372131
   rotation:
-    yaw: 0
+    yaw: -90
     pitch: 0
     roll: 0
   path:

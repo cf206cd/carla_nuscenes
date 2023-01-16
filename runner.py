@@ -3,6 +3,7 @@ from dataset import Dataset
 import yaml
 from yamlinclude import YamlIncludeConstructor
 import traceback
+import carla
 
 YamlIncludeConstructor.add_to_loader_class(loader_class=yaml.FullLoader)
 class Runner:
@@ -65,7 +66,10 @@ class Runner:
                     sample_token = self.dataset.update_sample(sample_token,scene_token,*self.collect_client.get_sample())
                     for sensor in self.collect_client.sensors:
                         if sensor.bp_name in ['sensor.camera.rgb','sensor.other.radar','sensor.lidar.ray_cast']:
+                            print(sensor.bp_name,len(sensor.get_data_list()))
                             for idx,sample_data in enumerate(sensor.get_data_list()):
+                                if isinstance(sample_data[1],carla.LidarMeasurement):
+                                    print(len(sample_data[1]))
                                 ego_pose_token = self.dataset.update_ego_pose(scene_token,calibrated_sensors_token[sensor.name],*self.collect_client.get_ego_pose(sample_data))
                                 is_key_frame = False
                                 if idx == len(sensor.get_data_list())-1:

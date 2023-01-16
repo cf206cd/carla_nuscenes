@@ -19,7 +19,7 @@ sensors:
     location: 
       x: 1.5
       y: 0
-      z: 1.5
+      z: 2
     rotation:
       yaw: 0
       pitch: 0
@@ -33,7 +33,7 @@ sensors:
     location: 
       x: 1.5
       y: 0.7
-      z: 1.5
+      z: 2
     rotation:
       yaw: 55
       pitch: 0
@@ -47,7 +47,7 @@ sensors:
     location: 
       x: 1.5
       y: -0.7
-      z: 1.5
+      z: 2
     rotation:
       yaw: -55
       pitch: 0
@@ -61,7 +61,7 @@ sensors:
     location: 
       x: -0.7
       y: 0
-      z: 1.5
+      z: 2
     rotation:
       yaw: -110
       pitch: 0
@@ -75,7 +75,7 @@ sensors:
     location: 
       x: -1.5
       y: 0
-      z: 1.5
+      z: 2
     rotation:
       yaw: 180
       pitch: 0
@@ -89,7 +89,7 @@ sensors:
     location: 
       x: -0.7
       y: 0
-      z: 1.5
+      z: 2
     rotation:
       yaw: 110
       pitch: 0
@@ -104,7 +104,7 @@ sensors:
     location: 
       x: 1.5
       y: 0
-      z: 0
+      z: 0.5
     rotation:
       yaw: 0
       pitch: 0
@@ -117,7 +117,7 @@ sensors:
     location: 
       x: 1.5
       y: 0.7
-      z: 0
+      z: 0.5
     rotation:
       yaw: 90
       pitch: 0
@@ -131,7 +131,7 @@ sensors:
     location: 
       x: 1.5
       y: -0.7
-      z: 0
+      z: 0.5
     rotation:
       yaw: -90
       pitch: 0
@@ -144,7 +144,7 @@ sensors:
     location: 
       x: -1.5
       y: 0.7
-      z: 0
+      z: 0.5
     rotation:
       yaw: 180
       pitch: 0
@@ -157,7 +157,7 @@ sensors:
     location: 
       x: -1.5
       y: -0.7
-      z: 0
+      z: 0.5
     rotation:
       yaw: 180
       pitch: 0
@@ -185,7 +185,8 @@ sensors:
       'lower_fov': '-30'
       'horizontal_fov': '360'
       'sensor_tick': '0.05'
-      'rotation_frequency': '20'
+      'rotation_frequency': '100'
+
   #-----------gnss----------
   - 
     name: "GNSS"

@@ -35,7 +35,7 @@ worlds:  #map
         location: "chengdu"
         scenes:
           - 
-            collect_time: 30
+            collect_time: 3
             keyframe_time: 0.5
             weather_mode: "custom"
             weather:
@@ -60,7 +60,7 @@ worlds:  #map
                 y: 27.47465705871582
                 z: 0.5999999642372131
               rotation: 
-                yaw: 0.15919798612594604
+                yaw: -90
                 pitch: 0.0
                 roll: 0.0
               options: ~

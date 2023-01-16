@@ -5,7 +5,7 @@
       y: 30.96375846862793
       z: 0.5999999642372131
   rotation:
-    yaw: 0.15919798612594604
+    yaw: -90
     pitch: 0
     roll: 0
   destination: ~
