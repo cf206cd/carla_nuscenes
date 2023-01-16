@@ -179,13 +179,13 @@ sensors:
       roll: 0
     options: 
       'channels': '32'
-      'points_per_second': '200000'
+      'points_per_second': '1400000'
       'range': '80'
       'upper_fov': '10'
       'lower_fov': '-30'
       'horizontal_fov': '360'
       'sensor_tick': '0.05'
-      'rotation_frequency': '100'
+      'rotation_frequency': '20'
   #-----------gnss----------
   - 
     name: "GNSS"

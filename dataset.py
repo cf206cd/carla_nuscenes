@@ -162,8 +162,10 @@ class Dataset:
         sensor = self.get_item("sensor",self.get_item("calibrated_sensor",calibrated_sensor_token)["sensor_token"])
         if sensor["modality"] == "camera":
             sample_data_item["fileformat"] = "jpg"
-        elif sensor["modality"] == "radar" or sensor["modality"] == "lidar":
-             sample_data_item["fileformat"] = "pcd"
+        elif sensor["modality"] == "radar":
+            sample_data_item["fileformat"] = "pcd"
+        elif sensor["modality"] == "lidar":
+            sample_data_item["fileformat"] = "pcd.bin"
         sample_data_item["is_key_frame"] = is_key_frame
         sample_data_item["height"] = height
         sample_data_item["width"] = width
