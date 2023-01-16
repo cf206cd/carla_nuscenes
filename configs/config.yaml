@@ -1,6 +1,3 @@
-collect_time: 30
-keyframe_time: 0.5
-
 dataset:
   root: "./dataset"
   version: "v1.14"
@@ -36,6 +33,7 @@ worlds:  #map
         timezone: "+0800"
         vehicle: "c0003"
         location: "chengdu"
+        collect_time: 30
         scenes:
           - 
             weather_mode: "custom"

@@ -60,10 +60,10 @@ class Runner:
                 samples_data_token[sensor.name] = ""
 
             sample_token = ""
-            for count in range(int(self.config["collect_time"]/self.collect_client.settings.fixed_delta_seconds)):
+            for count in range(int(self.scene_config["collect_time"]/self.collect_client.settings.fixed_delta_seconds)):
                 print("count:",count)
                 self.collect_client.tick()
-                if (count+1)%int(self.config["keyframe_time"]/self.collect_client.settings.fixed_delta_seconds) == 0:
+                if (count+1)%int(self.scene_config["keyframe_time"]/self.collect_client.settings.fixed_delta_seconds) == 0:
                     sample_token = self.dataset.update_sample(sample_token,scene_token,*self.collect_client.get_sample())
                     for sensor in self.collect_client.sensors:
                         if sensor.bp_name in ['sensor.camera.rgb','sensor.other.radar','sensor.lidar.ray_cast']:

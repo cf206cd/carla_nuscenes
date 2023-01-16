@@ -173,7 +173,7 @@ class CollectClient:
     def get_visibility(self,instance):
         max_visible_point_count = 0
         for sensor in self.sensors:
-            if sensor.bp_name == 'sensor.camera.rgb':
+            if sensor.bp_name == 'sensor.lidar.ray_cast':
                 ego_position = sensor.get_transform().location
                 ego_position.z += self.ego_vehicle.get_size().z*0.5
                 instance_position = instance.get_transform().location
