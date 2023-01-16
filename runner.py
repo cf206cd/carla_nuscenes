@@ -28,7 +28,7 @@ class Runner:
                 map_token = self.dataset.update_map(world_config["map_name"],world_config["map_category"])
                 for capture_config in world_config["captures"]:
                     log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
-                                            capture_config["timezone"],capture_config["vehicle"],capture_config["location"])
+                                            capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])
                     for scene_id,scene_config in enumerate(capture_config["scenes"]):
                         self._add_one_scene(log_token,scene_id,scene_config)
             except:
