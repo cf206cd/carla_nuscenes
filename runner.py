@@ -18,9 +18,9 @@ class Runner:
         for category in self.config["categories"]:
             self.dataset.update_category(category["name"],category["description"])
         for attribute in self.config["attributes"]:
-            self.attribute_token = self.dataset.update_attribute(attribute["name"],category["description"])
+            self.dataset.update_attribute(attribute["name"],category["description"])
         for visibility in self.config["visibility"]:
-            self.visibility = self.dataset.update_visibility(visibility["description"],visibility["level"])
+            self.dataset.update_visibility(visibility["description"],visibility["level"])
 
         for world_config in self.config["worlds"]:
             try:
@@ -30,16 +30,14 @@ class Runner:
                     log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
                                             capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])
                     for scene_id,scene_config in enumerate(capture_config["scenes"]):
-                        self._add_one_scene(log_token,scene_id,scene_config)
+                        self.add_one_scene(log_token,scene_id,scene_config)
             except:
                 traceback.print_exc()
             finally:
                 self.collect_client.destroy_world()    
         self.dataset.save()
-    def add_one_scene(self):
-        pass#todo
 
-    def _add_one_scene(self,log_token,scene_id,scene_config):
+    def add_one_scene(self,log_token,scene_id,scene_config):
         try:
             calibrated_sensors_token = {}
             samples_data_token = {}
