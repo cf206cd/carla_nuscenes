@@ -42,7 +42,7 @@ class Runner:
                 self.collect_client.destroy_world()
 
     def continue_generate(self):#to check
-        self.dataset = Dataset(**self.config["dataset"],True)
+        self.dataset = Dataset(**self.config["dataset"],load = True)
         scene_token = self.dataset.load_checkpoint()["scene_token"]
         flag = False
         for world_config in self.config["worlds"]:
@@ -56,7 +56,7 @@ class Runner:
                         current_scene_token = self.data.get_token("scene",log_token+"scene-"+str(scene_id))
                         if flag is False and current_scene_token == scene_token:
                             flag = True
-                        else:
+                        if flag is True:
                             scene_token = self.add_one_scene(log_token,scene_id,scene_config)
             except:
                 self.dataset.save_checkpoint(scene_token)
@@ -94,7 +94,6 @@ class Runner:
                     sample_token = self.dataset.update_sample(sample_token,scene_token,*self.collect_client.get_sample())
                     for sensor in self.collect_client.sensors:
                         if sensor.bp_name in ['sensor.camera.rgb','sensor.other.radar','sensor.lidar.ray_cast']:
-                            print(sensor.bp_name,len(sensor.get_data_list()))
                             for idx,sample_data in enumerate(sensor.get_data_list()):
                                 if isinstance(sample_data[1],carla.LidarMeasurement):
                                     print(len(sample_data[1]))
