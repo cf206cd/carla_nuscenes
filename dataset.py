@@ -273,3 +273,13 @@ class Dataset:
         name = log_file+"_"+channel+"_"+str(sample_data_item["timestamp"])+"."+sample_data_item["fileformat"]
         filename = os.path.join(dir,channel,name)
         return filename
+
+    def save_checkpoint(self,scene_token):
+        checkpoint_dict = {"scene_token",scene_token}
+        json_path = os.path.join(self.json_dir,"checkpoint.json")
+        dump(checkpoint_dict,json_path)
+
+    def load_checkpoint(self):
+        json_path = os.path.join(self.json_dir,"checkpoint.json")
+        checkpoint_dict = load(json_path)
+        return checkpoint_dict
