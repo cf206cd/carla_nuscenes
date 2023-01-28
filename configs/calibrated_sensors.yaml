@@ -13,6 +13,7 @@ RadarBaseOptions: &RadarBaseOptions
   'sensor_tick': '0.076923'
 
 sensors:
+  #-----------camera----------
   - 
     name: "CAM_FRONT"
     bp_name: 'sensor.camera.rgb'
