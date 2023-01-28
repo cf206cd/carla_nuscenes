@@ -8,7 +8,7 @@ def parse_image(image):
     array = np.reshape(array, (image.height, image.width, 4))
     return array
 
-def parse_lidar_data(lidar_data):#to check
+def parse_lidar_data(lidar_data):
     points = []
     current_channel = 0
     end_idx = lidar_data.get_point_count(current_channel)

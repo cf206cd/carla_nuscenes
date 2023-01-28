@@ -34,37 +34,10 @@ class Runner:
                     for scene_id,scene_config in enumerate(capture_config["scenes"]):
                         scene_token = self.add_one_scene(log_token,scene_id,scene_config)
             except:
-                if scene_token is not None:
-                    self.dataset.save_checkpoint(scene_token)
                 traceback.print_exc()
             finally:
                 self.dataset.save()
                 self.collect_client.destroy_world()
-
-    def continue_generate(self):#to check
-        self.dataset = Dataset(**self.config["dataset"],load = True)
-        scene_token = self.dataset.load_checkpoint()["scene_token"]
-        flag = False
-        for world_config in self.config["worlds"]:
-            try:
-                self.collect_client.generate_world(world_config)
-                map_token = self.dataset.update_map(world_config["map_name"],world_config["map_category"])
-                for capture_config in world_config["captures"]:
-                    log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
-                                            capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])
-                    for scene_id,scene_config in enumerate(capture_config["scenes"]):
-                        current_scene_token = self.data.get_token("scene",log_token+"scene-"+str(scene_id))
-                        if flag is False and current_scene_token == scene_token:
-                            flag = True
-                        if flag is True:
-                            scene_token = self.add_one_scene(log_token,scene_id,scene_config)
-            except:
-                self.dataset.save_checkpoint(scene_token)
-                traceback.print_exc()
-            finally:
-                self.dataset.save()
-                self.collect_client.destroy_world()
-
 
     def add_one_scene(self,log_token,scene_id,scene_config):
         try:
@@ -109,7 +82,5 @@ class Runner:
                     
                     for sensor in self.collect_client.sensors:
                         sensor.get_data_list().clear()
-        except:
-            self.dataset.save_checkpoint(scene_token)
         finally:
             self.collect_client.destroy_scene()
