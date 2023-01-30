@@ -6,7 +6,7 @@ import json
 def transform_timestamp(timestamp):
     return int(timestamp*10e6)
 
-def get_token(key,data):
+def generate_token(key,data):
     obj = hashlib.md5(str(key).encode('utf-8'))
     obj.update(str(data).encode('utf-8'))
     result = obj.hexdigest()

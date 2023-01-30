@@ -7,14 +7,14 @@ import carla
 
 YamlIncludeConstructor.add_to_loader_class(loader_class=yaml.FullLoader)
 class Runner:
-    def __init__(self,config_path):
-        with open(config_path,'r') as f:
-            self.config = yaml.load(f.read(),Loader=yaml.FullLoader)
+    def __init__(self,config):
+        self.config = config
         self.collect_client = CollectClient(self.config["client"])
 
-    def generate_full_dataset(self):
-        scene_token = None
+    def generate_new_dataset(self):
+        print("generate new dataset!")
         self.dataset = Dataset(**self.config["dataset"])
+        self.dataset.save()
         for sensor in self.config["sensors"]:
             self.dataset.update_sensor(sensor["name"],sensor["modality"])
         for category in self.config["categories"]:
@@ -32,11 +32,13 @@ class Runner:
                     log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
                                             capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])
                     for scene_id,scene_config in enumerate(capture_config["scenes"]):
+                        print(self.dataset.data["current_scene_count"])
                         scene_token = self.add_one_scene(log_token,scene_id,scene_config)
+                        self.dataset.update_scene_count()
+                        self.dataset.save()
             except:
                 traceback.print_exc()
             finally:
-                self.dataset.save()
                 self.collect_client.destroy_world()
 
     def add_one_scene(self,log_token,scene_id,scene_config):
@@ -60,16 +62,14 @@ class Runner:
                 samples_data_token[sensor.name] = ""
 
             sample_token = ""
-            for count in range(int(scene_config["collect_time"]/self.collect_client.settings.fixed_delta_seconds)):
-                print("count:",count)
+            for frame_count in range(int(scene_config["collect_time"]/self.collect_client.settings.fixed_delta_seconds)):
+                print("frame count:",frame_count)
                 self.collect_client.tick()
-                if (count+1)%int(scene_config["keyframe_time"]/self.collect_client.settings.fixed_delta_seconds) == 0:
+                if (frame_count+1)%int(scene_config["keyframe_time"]/self.collect_client.settings.fixed_delta_seconds) == 0:
                     sample_token = self.dataset.update_sample(sample_token,scene_token,*self.collect_client.get_sample())
                     for sensor in self.collect_client.sensors:
                         if sensor.bp_name in ['sensor.camera.rgb','sensor.other.radar','sensor.lidar.ray_cast']:
                             for idx,sample_data in enumerate(sensor.get_data_list()):
-                                if isinstance(sample_data[1],carla.LidarMeasurement):
-                                    print(len(sample_data[1]))
                                 ego_pose_token = self.dataset.update_ego_pose(scene_token,calibrated_sensors_token[sensor.name],*self.collect_client.get_ego_pose(sample_data))
                                 is_key_frame = False
                                 if idx == len(sensor.get_data_list())-1:
@@ -84,3 +84,36 @@ class Runner:
                         sensor.get_data_list().clear()
         finally:
             self.collect_client.destroy_scene()
+
+    def continue_generating(self):
+        print("continue generating!")
+        scene_count=0
+        self.dataset = Dataset(**self.config["dataset"],load=True)
+        for sensor in self.config["sensors"]:
+            self.dataset.update_sensor(sensor["name"],sensor["modality"],False)
+        for category in self.config["categories"]:
+            self.dataset.update_category(category["name"],category["description"],False)
+        for attribute in self.config["attributes"]:
+            self.dataset.update_attribute(attribute["name"],category["description"],False)
+        for visibility in self.config["visibility"]:
+            self.dataset.update_visibility(visibility["description"],visibility["level"],False)
+
+        for world_config in self.config["worlds"]:
+            try:
+                self.collect_client.generate_world(world_config)
+                map_token = self.dataset.update_map(world_config["map_name"],world_config["map_category"],False)
+                for capture_config in world_config["captures"]:
+                    log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
+                                            capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"],False)
+                    for scene_id,scene_config in enumerate(capture_config["scenes"]):
+                        scene_count+=1
+                        if scene_count>self.dataset.data["current_scene_count"]:
+                            print(self.dataset.data["current_scene_count"])
+                            scene_token = self.add_one_scene(log_token,scene_id,scene_config)
+                            self.dataset.update_scene_count()
+                            self.dataset.save()
+            except:
+                traceback.print_exc()
+            finally:
+                self.collect_client.destroy_world()
+

@@ -3,7 +3,7 @@ from sensor import *
 from vehicle import Vehicle
 from walker import Walker
 import math
-from utils import get_token,get_nuscenes_rt,get_intrinsic,transform_timestamp
+from utils import generate_token,get_nuscenes_rt,get_intrinsic,transform_timestamp
     
 class CollectClient:
     def __init__(self,client_config):
@@ -122,7 +122,7 @@ class CollectClient:
         self.world.apply_settings(self.original_settings)
 
     def get_calibrated_sensor(self,sensor):
-        sensor_token = get_token("sensor",sensor.name)
+        sensor_token = generate_token("sensor",sensor.name)
         channel = sensor.name
         if sensor.bp_name == "sensor.camera.rgb":
             intrinsic = get_intrinsic(float(sensor.get_actor().attributes["fov"]),
@@ -151,14 +151,14 @@ class CollectClient:
         return (transform_timestamp(self.world.get_snapshot().timestamp.elapsed_seconds),)
 
     def get_instance(self,scene_id,instance):
-        category_token = get_token("category",self.category_dict[instance.blueprint.id])
+        category_token = generate_token("category",self.category_dict[instance.blueprint.id])
         id = hash((scene_id,instance.get_actor().id))
         return category_token,id
 
     def get_sample_annotation(self,scene_id,instance):
-        instance_token = get_token("instance",hash((scene_id,instance.get_actor().id)))
+        instance_token = generate_token("instance",hash((scene_id,instance.get_actor().id)))
         visibility_token = str(self.get_visibility(instance))
-        attribute_tokens = [get_token("attribute",attribute) for attribute in self.get_attributes(instance)]
+        attribute_tokens = [generate_token("attribute",attribute) for attribute in self.get_attributes(instance)]
         rotation,translation = get_nuscenes_rt(instance.get_transform())
         size = [instance.get_size().y,instance.get_size().x,instance.get_size().z]#xyz to whl
         num_lidar_pts = 0
