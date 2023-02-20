@@ -39,6 +39,14 @@ class CollectClient:
 
     def generate_scene(self,scene_config):
         print("generate scene start!")
+        if scene_config["random"]:
+            self.generate_random_scene()
+        else:
+            self.generate_custom_scene()
+        print("generate scene success!")
+
+    def generate_custom_scene(self,scene_config):
+        
         if scene_config["weather_mode"] == "custom":
             self.weather = carla.WeatherParameters(**scene_config["weather"])
         else:
@@ -97,7 +105,6 @@ class CollectClient:
             else:
                 print(response.error)
         self.sensors = list(filter(lambda sensor:sensor.get_actor(),self.sensors))
-        print("generate scene success!")
 
     def tick(self):
         self.world.tick()
