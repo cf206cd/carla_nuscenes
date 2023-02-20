@@ -24,7 +24,7 @@ worlds:  #map
     map_name: "Town03"
     map_category: "semantic_prior"
     settings:
-      fixed_delta_seconds: 0.01 
+      fixed_delta_seconds: 0.01
     captures: #log
       - 
         date: "2023-01-09"

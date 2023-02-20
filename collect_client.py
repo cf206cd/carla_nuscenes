@@ -4,7 +4,8 @@ from vehicle import Vehicle
 from walker import Walker
 import math
 from utils import generate_token,get_nuscenes_rt,get_intrinsic,transform_timestamp
-    
+import random
+
 class CollectClient:
     def __init__(self,client_config):
         self.client = carla.Client(client_config["host"],client_config["port"])
@@ -33,14 +34,17 @@ class CollectClient:
         self.settings.synchronous_mode = True
         self.settings.no_rendering_mode = False
         self.world.apply_settings(self.settings)
+        self.world.set_pedestrians_cross_factor(1)
         print("generate world success!")
 
     def generate_scene(self,scene_config):
         print("generate scene start!")
         if scene_config["weather_mode"] == "custom":
             self.weather = carla.WeatherParameters(**scene_config["weather"])
-            self.world.set_weather(self.weather)
-
+        else:
+            self.weather = getattr(carla.WeatherParameters, scene_config["weather_mode"])
+        
+        self.world.set_weather(self.weather)
         SpawnActor = carla.command.SpawnActor
         SetAutopilot = carla.command.SetAutopilot
         FutureActor = carla.command.FutureActor
@@ -97,6 +101,86 @@ class CollectClient:
 
     def tick(self):
         self.world.tick()
+
+    def generate_random_scene(self,scene_config):
+        print("generate randon scene start!")
+        self.weather = carla.WeatherParameters(**self.get_random_weather())
+        self.world.set_weather(self.weather)
+
+
+        SpawnActor = carla.command.SpawnActor
+        SetAutopilot = carla.command.SetAutopilot
+        FutureActor = carla.command.FutureActor
+
+        spawn_points = self.world.get_map().get_spawn_points()
+        random.shuffle(spawn_points)
+        
+        vehicle_bp_list = self.world.get_blueprint_library().filter("vehicle")
+        ego_bp_name=random.choice(vehicle_bp_list).id
+        ego_location={attr:getattr(spawn_points[0].location,attr) for attr in ["x","y","z"]}
+        ego_rotation={attr:getattr(spawn_points[0].rotation,attr) for attr in ["yaw","pitch","roll"]}
+        self.ego_vehicle = Vehicle(world=self.world,bp_name=ego_bp_name,location=ego_location,rotation=ego_rotation)
+        self.ego_vehicle.blueprint.set_attribute('role_name', 'hero')
+        self.ego_vehicle.spawn_actor()
+
+        self.vehicles = []
+        for spawn_point in spawn_points[1:random.randint(1,len(spawn_points))]:
+            location = {attr:getattr(spawn_point.location,attr) for attr in ["x","y","z"]}
+            rotation = {attr:getattr(spawn_point.rotation,attr) for attr in ["yaw","pitch","roll"]}
+            bp_name = random.choice(vehicle_bp_list).id
+            self.vehicles.append(Vehicle(world=self.world,bp_name=bp_name,location=location,rotation=rotation))
+        vehicles_batch = [SpawnActor(vehicle.blueprint,vehicle.transform)
+                            .then(SetAutopilot(FutureActor, True, self.trafficmanager.get_port())) 
+                            for vehicle in self.vehicles]
+
+        for i,response in enumerate(self.client.apply_batch_sync(vehicles_batch)):
+            if not response.error:
+                self.vehicles[i].set_actor(response.actor_id)
+            else:
+                print(response.error)
+        self.vehicles = list(filter(lambda vehicle:vehicle.get_actor(),self.vehicles))
+
+        walker_bp_list = self.world.get_blueprint_library().filter("walker")
+        self.walkers = []
+        for i in range(random.randint(len(spawn_points),len(spawn_points)*2)):
+            spawn = self.world.get_random_location_from_navigation()
+            if spawn != None:
+                bp_name=random.choice(walker_bp_list).id
+                spawn_location = {attr:getattr(spawn,attr) for attr in ["x","y","z"]}
+                destination=self.world.get_random_location_from_navigation()
+                destination_location={attr:getattr(destination,attr) for attr in ["x","y","z"]}
+                rotation = {"yaw":random.random()*360,"pitch":random.random()*360,"roll":random.random()*360}
+                self.walkers.append(Walker(world=self.world,location=spawn_location,rotation=rotation,destination=destination_location,bp_name=bp_name))
+            else:
+                print("walker generate fail")
+        walkers_batch = [SpawnActor(walker.blueprint,walker.transform) for walker in self.walkers]
+        for i,response in enumerate(self.client.apply_batch_sync(walkers_batch)):
+            if not response.error:
+                self.walkers[i].set_actor(response.actor_id)
+            else:
+                print(response.error)
+        self.walkers = list(filter(lambda walker:walker.get_actor(),self.walkers))
+
+        walker_controller_bp = self.world.get_blueprint_library().find('controller.ai.walker')
+        walkers_controller_batch = [SpawnActor(walker_controller_bp,carla.Transform(),walker.get_actor()) for walker in self.walkers]
+        for i,response in enumerate(self.client.apply_batch_sync(walkers_controller_batch)):
+                    if not response.error:
+                        self.walkers[i].set_controller(response.actor_id)
+                    else:
+                        print(response.error)
+        self.world.tick()
+        for walker in self.walkers:
+            walker.start()
+
+        self.sensors = [Sensor(world=self.world, attach_to=self.ego_vehicle.get_actor(), **sensor_config) for sensor_config in scene_config["calibrated_sensors"]["sensors"]]
+        sensors_batch = [SpawnActor(sensor.blueprint,sensor.transform,sensor.attach_to) for sensor in self.sensors]
+        for i,response in enumerate(self.client.apply_batch_sync(sensors_batch)):
+            if not response.error:
+                self.sensors[i].set_actor(response.actor_id)
+            else:
+                print(response.error)
+        self.sensors = list(filter(lambda sensor:sensor.get_actor(),self.sensors))
+        print("generate random scene success!")        
 
     def destroy_scene(self):
         if self.walkers is not None:
@@ -226,5 +310,24 @@ class CollectClient:
                 if instance.get_actor().bounding_box.contains(point,instance.get_actor().get_transform()):
                     num_radar_pts+=1
         return num_radar_pts
+
+    def get_random_weather(self):
+        weather_param = {
+            "cloudiness":random.random()*90,
+            "sun_azimuth_angle":random.random()*360,
+            "sun_altitude_angle":random.random()*180-90,
+            "precipitation":random.random()*80,
+            "precipitation_deposits":random.random()*85,
+            "wind_intensity":random.random()*100,
+            "fog_density":random.random()*30,
+            "fog_distance":random.random()*100,
+            "wetness":random.random()*100,
+            "fog_falloff":random.random()*5,
+            "scattering_intensity":random.random()*1,
+            "mie_scattering_scale":random.random()*1,
+            "rayleigh_scattering_scale":random.random()*1,
+            "dust_storm":random.random()*100
+        }
+        return weather_param
 
     

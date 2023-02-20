@@ -1,17 +1,13 @@
 from collect_client import CollectClient
 from dataset import Dataset
-import yaml
-from yamlinclude import YamlIncludeConstructor
 import traceback
-import carla
 
-YamlIncludeConstructor.add_to_loader_class(loader_class=yaml.FullLoader)
 class Runner:
     def __init__(self,config):
         self.config = config
         self.collect_client = CollectClient(self.config["client"])
 
-    def generate_new_dataset(self):
+    def generate_new_dataset(self,random=False):
         print("generate new dataset!")
         self.dataset = Dataset(**self.config["dataset"])
         self.dataset.save()
@@ -33,7 +29,7 @@ class Runner:
                                             capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])
                     for scene_id,scene_config in enumerate(capture_config["scenes"]):
                         print(self.dataset.data["current_scene_count"])
-                        scene_token = self.add_one_scene(log_token,scene_id,scene_config)
+                        scene_token = self.add_one_scene(log_token,scene_id,scene_config,random)
                         self.dataset.update_scene_count()
                         self.dataset.save()
             except:
@@ -41,14 +37,18 @@ class Runner:
             finally:
                 self.collect_client.destroy_world()
 
-    def add_one_scene(self,log_token,scene_id,scene_config):
+    def add_one_scene(self,log_token,scene_id,scene_config,random):
         try:
             calibrated_sensors_token = {}
             samples_data_token = {}
             instances_token = {}
             samples_annotation_token = {}
 
-            self.collect_client.generate_scene(scene_config)
+            if not random:
+                self.collect_client.generate_scene(scene_config)
+            else:
+                self.collect_client.generate_random_scene(scene_config)
+                
             scene_token = self.dataset.update_scene(log_token,scene_id,scene_config["description"])
 
             for instance in self.collect_client.walkers+self.collect_client.vehicles:

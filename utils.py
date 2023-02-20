@@ -1,6 +1,6 @@
 import hashlib
 import numpy as np
-import quaternion
+from pyquaternion import Quaternion
 import json
 
 def transform_timestamp(timestamp):
@@ -52,5 +52,5 @@ def get_nuscenes_rt(transform,mode=None):
             [0,0,1]
         ])
     rotation_matrix = rotation_matrix3@rotation_matrix2@rotation_matrix1
-    quat = quaternion.as_float_array(quaternion.from_rotation_matrix(rotation_matrix)).tolist()
+    quat = Quaternion(matrix=rotation_matrix).elements.tolist()
     return quat,translation
