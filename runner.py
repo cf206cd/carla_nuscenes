@@ -1,11 +1,12 @@
-from collect_client import CollectClient
+from carla_client import CarlaClient
 from dataset import Dataset
 import traceback
+import random
 
 class Runner:
     def __init__(self,config):
         self.config = config
-        self.collect_client = CollectClient(self.config["client"])
+        self.collect_client = CarlaClient(self.config["client"])
 
     def generate_new_dataset(self):
         print("generate new dataset!")
@@ -32,6 +33,103 @@ class Runner:
                         scene_token = self.add_one_scene(log_token,scene_id,scene_config)
                         self.dataset.update_scene_count()
                         self.dataset.save()
+            except:
+                traceback.print_exc()
+            finally:
+                self.collect_client.destroy_world()
+
+    def continue_generating_dataset(self):
+        print("continue generating!")
+        scene_count=0
+        self.dataset = Dataset(**self.config["dataset"],load=True)
+        for sensor in self.config["sensors"]:
+            self.dataset.update_sensor(sensor["name"],sensor["modality"],False)
+        for category in self.config["categories"]:
+            self.dataset.update_category(category["name"],category["description"],False)
+        for attribute in self.config["attributes"]:
+            self.dataset.update_attribute(attribute["name"],category["description"],False)
+        for visibility in self.config["visibility"]:
+            self.dataset.update_visibility(visibility["description"],visibility["level"],False)
+
+        for world_config in self.config["worlds"]:
+            try:
+                self.collect_client.generate_world(world_config)
+                map_token = self.dataset.update_map(world_config["map_name"],world_config["map_category"],False)
+                for capture_config in world_config["captures"]:
+                    log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
+                                            capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"],False)
+                    for scene_id,scene_config in enumerate(capture_config["scenes"]):
+                        scene_count+=1
+                        if scene_count>self.dataset.data["current_scene_count"]:
+                            print(self.dataset.data["current_scene_count"])
+                            scene_token = self.add_one_scene(log_token,scene_id,scene_config)
+                            self.dataset.update_scene_count()
+                            self.dataset.save()
+            except:
+                traceback.print_exc()
+            finally:
+                self.collect_client.destroy_world()
+
+    def generate_new_random_dataset(self):
+        print("generate new dataset!")
+        self.dataset = Dataset(**self.config["dataset"])
+        self.dataset.save()
+        for sensor in self.config["sensors"]:
+            self.dataset.update_sensor(sensor["name"],sensor["modality"])
+        for category in self.config["categories"]:
+            self.dataset.update_category(category["name"],category["description"])
+        for attribute in self.config["attributes"]:
+            self.dataset.update_attribute(attribute["name"],category["description"])
+        for visibility in self.config["visibility"]:
+            self.dataset.update_visibility(visibility["description"],visibility["level"])
+
+        for scene_id in range(self.config["scene_count"]):
+            world_config = random.choice(self.config["worlds"])
+            try:
+                self.collect_client.generate_world(world_config)
+                map_token = self.dataset.update_map(world_config["map_name"],world_config["map_category"])
+                self.collect_client.generate_world(world_config)
+                map_token = self.dataset.update_map(world_config["map_name"],world_config["map_category"])
+                capture_config = random.choice(world_config["captures"])
+                log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
+                                        capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])
+                scene_config = random.choice(capture_config["scenes"])
+                scene_config["description"] += str(scene_id)
+                print(self.dataset.data["current_scene_count"])
+                scene_token = self.add_one_scene(log_token,scene_id,scene_config)
+                self.dataset.update_scene_count()
+                self.dataset.save()
+            except:
+                traceback.print_exc()
+            finally:
+                self.collect_client.destroy_world()
+
+    def continue_generating_random_dataset(self):
+        print("continue generating!")
+        self.dataset = Dataset(**self.config["dataset"],load=True)
+        for sensor in self.config["sensors"]:
+            self.dataset.update_sensor(sensor["name"],sensor["modality"],False)
+        for category in self.config["categories"]:
+            self.dataset.update_category(category["name"],category["description"],False)
+        for attribute in self.config["attributes"]:
+            self.dataset.update_attribute(attribute["name"],category["description"],False)
+        for visibility in self.config["visibility"]:
+            self.dataset.update_visibility(visibility["description"],visibility["level"],False)
+
+        for scene_id in range(self.dataset.data["current_scene_count"],self.config["scene_count"]):
+            world_config = random.choice(self.config["worlds"])
+            try:
+                self.collect_client.generate_world(world_config)
+                map_token = self.dataset.update_map(world_config["map_name"],world_config["map_category"])
+                capture_config = random.choice(world_config["captures"])
+                log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
+                                        capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])
+                scene_config = random.choice(capture_config["scenes"])
+                scene_config["description"] += str(scene_id)
+                print(self.dataset.data["current_scene_count"])
+                scene_token = self.add_one_scene(log_token,scene_id,scene_config)
+                self.dataset.update_scene_count()
+                self.dataset.save()
             except:
                 traceback.print_exc()
             finally:
@@ -80,36 +178,3 @@ class Runner:
                         sensor.get_data_list().clear()
         finally:
             self.collect_client.destroy_scene()
-
-    def continue_generating(self):
-        print("continue generating!")
-        scene_count=0
-        self.dataset = Dataset(**self.config["dataset"],load=True)
-        for sensor in self.config["sensors"]:
-            self.dataset.update_sensor(sensor["name"],sensor["modality"],False)
-        for category in self.config["categories"]:
-            self.dataset.update_category(category["name"],category["description"],False)
-        for attribute in self.config["attributes"]:
-            self.dataset.update_attribute(attribute["name"],category["description"],False)
-        for visibility in self.config["visibility"]:
-            self.dataset.update_visibility(visibility["description"],visibility["level"],False)
-
-        for world_config in self.config["worlds"]:
-            try:
-                self.collect_client.generate_world(world_config)
-                map_token = self.dataset.update_map(world_config["map_name"],world_config["map_category"],False)
-                for capture_config in world_config["captures"]:
-                    log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
-                                            capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"],False)
-                    for scene_id,scene_config in enumerate(capture_config["scenes"]):
-                        scene_count+=1
-                        if scene_count>self.dataset.data["current_scene_count"]:
-                            print(self.dataset.data["current_scene_count"])
-                            scene_token = self.add_one_scene(log_token,scene_id,scene_config)
-                            self.dataset.update_scene_count()
-                            self.dataset.save()
-            except:
-                traceback.print_exc()
-            finally:
-                self.collect_client.destroy_world()
-

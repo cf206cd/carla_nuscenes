@@ -214,3 +214,17 @@ sensors:
       pitch: 0
       roll: 0
     options: ~
+  # -
+  #   name: "viz"
+  #   bp_name: 'sensor.camera.rgb'
+  #   location: 
+  #     x: 0
+  #     y: 0
+  #     z: 2
+  #   rotation:
+  #     yaw: 0
+  #     pitch: 0
+  #     roll: 0
+  #   options: 
+  #       <<: *CameraRGBBaseOptions
+  #       "fov": "70"

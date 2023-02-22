@@ -4,7 +4,6 @@ from actor import Actor
 
 def parse_image(image):
     array = np.frombuffer(image.raw_data, dtype=np.dtype("uint8"))
-    array = array.copy()
     array = np.reshape(array, (image.height, image.width, 4))
     return array
 
@@ -49,6 +48,10 @@ class Sensor(Actor):
     
     def set_actor(self, id):
         super().set_actor(id)
+        self.actor.listen(self.add_data)
+    
+    def spawn_actor(self):
+        super().spawn_actor()
         self.actor.listen(self.add_data)
 
     def get_last_data(self):

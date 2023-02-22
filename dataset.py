@@ -1,7 +1,7 @@
 import os
 from utils import load,dump,generate_token
 import carla
-from sensor import parse_image,parse_lidar_data,parse_radar_data
+from sensor import parse_lidar_data,parse_radar_data
 
 def save_image(image,path):
     image.save_to_disk(path)

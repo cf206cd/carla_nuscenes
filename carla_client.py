@@ -6,7 +6,7 @@ import math
 from utils import generate_token,get_nuscenes_rt,get_intrinsic,transform_timestamp
 import random
 
-class CollectClient:
+class CarlaClient:
     def __init__(self,client_config):
         self.client = carla.Client(client_config["host"],client_config["port"])
         self.client.set_timeout(client_config["time_out"])
@@ -39,10 +39,10 @@ class CollectClient:
 
     def generate_scene(self,scene_config):
         print("generate scene start!")
-        if scene_config["random"]:
-            self.generate_random_scene()
+        if scene_config["custom"]:
+            self.generate_custom_scene(scene_config)
         else:
-            self.generate_custom_scene()
+            self.generate_random_scene(scene_config)
         print("generate scene success!")
 
     def generate_custom_scene(self,scene_config):
@@ -110,7 +110,7 @@ class CollectClient:
         self.world.tick()
 
     def generate_random_scene(self,scene_config):
-        print("generate randon scene start!")
+        print("generate random scene start!")
         self.weather = carla.WeatherParameters(**self.get_random_weather())
         self.world.set_weather(self.weather)
 
@@ -122,14 +122,15 @@ class CollectClient:
         spawn_points = self.world.get_map().get_spawn_points()
         random.shuffle(spawn_points)
         
-        vehicle_bp_list = self.world.get_blueprint_library().filter("vehicle")
-        ego_bp_name=random.choice(vehicle_bp_list).id
+        
+        ego_bp_name=scene_config["ego_bp_name"]
         ego_location={attr:getattr(spawn_points[0].location,attr) for attr in ["x","y","z"]}
         ego_rotation={attr:getattr(spawn_points[0].rotation,attr) for attr in ["yaw","pitch","roll"]}
         self.ego_vehicle = Vehicle(world=self.world,bp_name=ego_bp_name,location=ego_location,rotation=ego_rotation)
         self.ego_vehicle.blueprint.set_attribute('role_name', 'hero')
         self.ego_vehicle.spawn_actor()
 
+        vehicle_bp_list = self.world.get_blueprint_library().filter("vehicle")
         self.vehicles = []
         for spawn_point in spawn_points[1:random.randint(1,len(spawn_points))]:
             location = {attr:getattr(spawn_point.location,attr) for attr in ["x","y","z"]}
@@ -147,7 +148,7 @@ class CollectClient:
                 print(response.error)
         self.vehicles = list(filter(lambda vehicle:vehicle.get_actor(),self.vehicles))
 
-        walker_bp_list = self.world.get_blueprint_library().filter("walker")
+        walker_bp_list = self.world.get_blueprint_library().filter("pedestrian")
         self.walkers = []
         for i in range(random.randint(len(spawn_points),len(spawn_points)*2)):
             spawn = self.world.get_random_location_from_navigation()
@@ -249,6 +250,7 @@ class CollectClient:
     def get_sample_annotation(self,scene_id,instance):
         instance_token = generate_token("instance",hash((scene_id,instance.get_actor().id)))
         visibility_token = str(self.get_visibility(instance))
+        
         attribute_tokens = [generate_token("attribute",attribute) for attribute in self.get_attributes(instance)]
         rotation,translation = get_nuscenes_rt(instance.get_transform())
         size = [instance.get_size().y,instance.get_size().x,instance.get_size().z]#xyz to whl

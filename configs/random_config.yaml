@@ -1,0 +1,47 @@
+dataset:
+  root: "./dataset"
+  version: "v1.14"
+
+client:
+  host: 127.0.0.1
+  port: 2000
+  time_out: 10.0
+
+sensors:
+  !include ./configs/sensors.yaml
+
+categories:
+  !include ./configs/categories.yaml
+
+attributes:
+  !include ./configs/attributes.yaml
+
+visibility:
+  !include ./configs/visibility.yaml 
+
+scene_count: 1000
+
+worlds:  #map
+  - 
+    map_name: "Town03"
+    map_category: "semantic_prior"
+    settings:
+      fixed_delta_seconds: 0.01
+    captures: #log
+      - 
+        date: "2023-01-09"
+        time: "10-45-20"
+        timezone: "+0800"
+        capture_vehicle: "c0003"
+        location: "chengdu"
+        scenes:
+          - 
+            custom: False
+            collect_time: 20
+            keyframe_time: 0.5
+            ego_bp_name: "vehicle.tesla.model3"
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "test"
+          
