@@ -88,8 +88,6 @@ class Generator:
             try:
                 self.collect_client.generate_world(world_config)
                 map_token = self.dataset.update_map(world_config["map_name"],world_config["map_category"])
-                self.collect_client.generate_world(world_config)
-                map_token = self.dataset.update_map(world_config["map_name"],world_config["map_category"])
                 capture_config = random.choice(world_config["captures"])
                 log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
                                         capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])

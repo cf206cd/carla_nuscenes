@@ -26,30 +26,30 @@ class KeyboardControl:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return True
-                if event.key== pygame.K_BACKSPACE:
-                    self.reverse = not self.reverse
+        #         if event.key== pygame.K_BACKSPACE:
+        #             self.reverse = not self.reverse
 
-        keys_pressed = pygame.key.get_pressed()
-        if keys_pressed[pygame.K_LEFT]:
-            self.steer=max(-0.7,self.steer-0.01)
-        if keys_pressed[pygame.K_RIGHT]:
-            self.steer=min(0.7,self.steer+0.01)
-        if keys_pressed[pygame.K_UP]:
-            if self.throttle == 0:
-                self.throttle = 0.4
-            self.throttle=min(1,self.throttle+0.01)
-        else:
-            self.throttle=0
-        if keys_pressed[pygame.K_DOWN]:
-            if self.brake == 0:
-                self.brake = 0.4
-            self.brake=min(1,self.brake+0.01)
-        else:
-            self.brake=0
-        control = carla.VehicleControl(self.throttle,self.steer,self.brake,reverse = self.reverse)
-        print(control)
-        self.player.apply_control(control)
-        return False
+        # keys_pressed = pygame.key.get_pressed()
+        # if keys_pressed[pygame.K_LEFT]:
+        #     self.steer=max(-0.7,self.steer-0.01)
+        # if keys_pressed[pygame.K_RIGHT]:
+        #     self.steer=min(0.7,self.steer+0.01)
+        # if keys_pressed[pygame.K_UP]:
+        #     if self.throttle == 0:
+        #         self.throttle = 0.4
+        #     self.throttle=min(1,self.throttle+0.01)
+        # else:
+        #     self.throttle=0
+        # if keys_pressed[pygame.K_DOWN]:
+        #     if self.brake == 0:
+        #         self.brake = 0.4
+        #     self.brake=min(1,self.brake+0.01)
+        # else:
+        #     self.brake=0
+        # control = carla.VehicleControl(self.throttle,self.steer,self.brake,reverse = self.reverse)
+        # print(control)
+        # self.player.apply_control(control)
+        # return False
 class Visualizer:
     def __init__(self,config):
         self.config = config
@@ -63,7 +63,7 @@ class Visualizer:
             self.display = pygame.display.set_mode((self.config["ui"]["width"],self.config["ui"]["height"]),pygame.HWSURFACE | pygame.DOUBLEBUF)
             self.display.fill((0,0,0))
             pygame.display.flip()
-            self.client.ego_vehicle.get_actor().set_autopilot(False)
+            self.client.ego_vehicle.get_actor().set_autopilot(True)#also can set False
             self.keyboard_control = KeyboardControl(self.client.ego_vehicle.get_actor())
             clock=pygame.time.Clock()
             self.vis_camera = Sensor(world=self.client.world, attach_to=self.client.ego_vehicle.get_actor(), **self.config["vis_camera"])
@@ -88,10 +88,7 @@ class Visualizer:
                 if self.keyboard_control.parse_events():
                     return
                 else:
-                    t1 = time.time()
                     self.client.tick()
-                    t2 = time.time()
-                    print(t2-t1)
                     if self.vis_camera.get_last_data():
                         image = self.vis_camera.get_last_data()[1]
                         self.display_image(image,rect["FRAME"])
@@ -117,6 +114,11 @@ class Visualizer:
         data = frame.tobytes()
         py_image = pygame.image.frombytes(data, size, mode)
         self.display.blit(py_image,rect[0:2])
-
+    
+    def get_input(self,):
+        pass
+    
+    def predict(self,):
+        pass
 vis  = Visualizer(config)
 vis.run()
