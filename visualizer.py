@@ -1,13 +1,13 @@
 import carla
-from carla_client import CarlaClient
+from client import Client
 from sensor import Sensor,parse_image
 import pygame
 import yaml
 from yamlinclude import YamlIncludeConstructor
-from dataset import save_data
-
+import traceback
+from PIL import Image
 YamlIncludeConstructor.add_to_loader_class(loader_class=yaml.FullLoader)
-config_path = "./configs/viz_config.yaml"
+config_path = "./configs/vis_config.yaml"
 with open(config_path,'r') as f:
     config = yaml.load(f.read(),Loader=yaml.FullLoader)
 
@@ -16,69 +16,107 @@ class KeyboardControl:
         self.player = player
         self.steer=0
         self.throttle=0
+        self.brake=0
+        self.reverse = False
 
     def parse_events(self):
         for event in pygame.event.get():
-            print("FUCK")
             if event.type == pygame.QUIT:
                 return True
             elif event.type == pygame.KEYDOWN:
-                print("DOWN")
-                if event.key == pygame.K_LEFT:
-                    self.steer=max(0,self.steer-0.1)
-                if event.key == pygame.K_RIGHT:
-                    self.steer=min(1,self.steer+0.1)
-                if event.key == pygame.K_UP:
-                    self.throttle=min(1,self.throttle+0.1)
-                if event.key == pygame.K_DOWN:
-                    self.throttle=max(0,self.throttle-0.1)
                 if event.key == pygame.K_ESCAPE:
                     return True
-            control = carla.VehicleControl(self.throttle,self.steer)
-            print(control)
-            self.player.apply_control(control)
-            return False
+                if event.key== pygame.K_BACKSPACE:
+                    self.reverse = not self.reverse
+
+        keys_pressed = pygame.key.get_pressed()
+        if keys_pressed[pygame.K_LEFT]:
+            self.steer=max(-0.7,self.steer-0.01)
+        if keys_pressed[pygame.K_RIGHT]:
+            self.steer=min(0.7,self.steer+0.01)
+        if keys_pressed[pygame.K_UP]:
+            if self.throttle == 0:
+                self.throttle = 0.4
+            self.throttle=min(1,self.throttle+0.01)
+        else:
+            self.throttle=0
+        if keys_pressed[pygame.K_DOWN]:
+            if self.brake == 0:
+                self.brake = 0.4
+            self.brake=min(1,self.brake+0.01)
+        else:
+            self.brake=0
+        control = carla.VehicleControl(self.throttle,self.steer,self.brake,reverse = self.reverse)
+        print(control)
+        self.player.apply_control(control)
+        return False
 class Visualizer:
     def __init__(self,config):
         self.config = config
-        self.client = CarlaClient(self.config["client"])
+        self.client = Client(self.config["client"])
 
     def run(self):
-        self.client.generate_world(self.config["world"])
-        self.client.generate_random_scene(self.config["scene"])
-        pygame.init()
-        display = pygame.display.set_mode((self.config["ui"]["width"],self.config["ui"]["height"]),pygame.HWSURFACE | pygame.DOUBLEBUF)
-        display.fill((0,0,0))
-        pygame.display.flip()
-        self.client.ego_vehicle.get_actor().set_autopilot(False)
-        self.keyboard_control = KeyboardControl(self.client.ego_vehicle.get_actor())
-        clock=pygame.time.Clock()
-        self.viz_camera = Sensor(world=self.client.world, attach_to=self.client.ego_vehicle.get_actor(), **self.config["viz_camera"])
-        self.viz_camera.spawn_actor()
-        self.client.tick()
-        import time
-        while True:
-            clock.tick_busy_loop(60)
-            if self.keyboard_control.parse_events():
-                return
-            else:
-                t1 = time.time()
-                self.client.tick()
-                t2 = time.time()
-                if self.viz_camera.get_data_list():
-                    #save_data(self.viz_camera.get_last_data()[1],"./q.png")
-                    array = parse_image(self.viz_camera.get_last_data()[1])
-                    array = array[:, :, :3]
-                    array = array[:, :, ::-1]
-                    array = array.swapaxes(0, 1)
-                    self.surface = pygame.surfarray.make_surface(array)
-                    t3 = time.time()
-                    display.blit(self.surface,(0,0))
-                    t4 = time.time()
+        try:
+            self.client.generate_world(self.config["world"])
+            self.client.generate_random_scene(self.config["scene"])
+            pygame.init()
+            self.display = pygame.display.set_mode((self.config["ui"]["width"],self.config["ui"]["height"]),pygame.HWSURFACE | pygame.DOUBLEBUF)
+            self.display.fill((0,0,0))
+            pygame.display.flip()
+            self.client.ego_vehicle.get_actor().set_autopilot(False)
+            self.keyboard_control = KeyboardControl(self.client.ego_vehicle.get_actor())
+            clock=pygame.time.Clock()
+            self.vis_camera = Sensor(world=self.client.world, attach_to=self.client.ego_vehicle.get_actor(), **self.config["vis_camera"])
+            self.vis_camera.spawn_actor()
+            self.client.tick()
+            w=self.config["ui"]["width"]
+            h=self.config["ui"]["height"]
+            rect = {
+                "FRAME":(0,0,w*3//4,h*3//5),
+                "CAM_FRONT_LEFT":(0,h*3//5,w//4,h//5),
+                "CAM_FRONT":(w//4,h*3//5,w//4,h//5),
+                "CAM_FRONT_RIGHT":(w*2//4,h*3//5,w//4,h//5),
+                "CAM_BACK_LEFT":(0,h*4//5,w//4,h//5),
+                "CAM_BACK":(w//4,h*4//5,w//4,h//5),
+                "CAM_BACK_RIGHT":(w*2//4,h*4//5,w//4,h//5),
+                "GROUND_TRUTH":(w*3//4,0,w//4,h//2),
+                "PREDICTION":(w*3//4,h//2,w//4,h//2)
+            }
+            import time
+            while True:
+                clock.tick()
+                if self.keyboard_control.parse_events():
+                    return
+                else:
+                    t1 = time.time()
+                    self.client.tick()
+                    t2 = time.time()
+                    print(t2-t1)
+                    if self.vis_camera.get_last_data():
+                        image = self.vis_camera.get_last_data()[1]
+                        self.display_image(image,rect["FRAME"])
+                        self.vis_camera.get_data_list().clear()
+                    for sensor in self.client.sensors:
+                        if sensor.name in rect.keys() and sensor.get_data_list():
+                            image = sensor.get_last_data()[1]
+                            self.display_image(image,rect[sensor.name])
+                            sensor.get_data_list().clear()
                     pygame.display.flip()
-                    t5 = time.time()
-                    self.viz_camera.get_data_list().clear()
-                t6 = time.time()
-                print(t2-t1,t3-t2,t4-t3,t5-t4,t6-t5)
+                    
+        except:
+            traceback.print_exc()
+        finally:
+            self.client.destroy_scene()
+            self.client.destroy_world()
+
+    def display_image(self,image,rect):
+        b,g,r,a = Image.frombuffer("RGBA",(image.width,image.height),image.raw_data).split()
+        frame = Image.merge("RGBA", (r,g,b,a)).resize(rect[2:])
+        mode = frame.mode
+        size = frame.size
+        data = frame.tobytes()
+        py_image = pygame.image.frombytes(data, size, mode)
+        self.display.blit(py_image,rect[0:2])
+
 vis  = Visualizer(config)
 vis.run()

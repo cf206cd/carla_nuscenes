@@ -6,7 +6,7 @@ import math
 from utils import generate_token,get_nuscenes_rt,get_intrinsic,transform_timestamp
 import random
 
-class CarlaClient:
+class Client:
     def __init__(self,client_config):
         self.client = carla.Client(client_config["host"],client_config["port"])
         self.client.set_timeout(client_config["time_out"])

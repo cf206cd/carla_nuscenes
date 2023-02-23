@@ -1,12 +1,12 @@
-from carla_client import CarlaClient
+from client import Client
 from dataset import Dataset
 import traceback
 import random
 
-class Runner:
+class Generator:
     def __init__(self,config):
         self.config = config
-        self.collect_client = CarlaClient(self.config["client"])
+        self.collect_client = Client(self.config["client"])
 
     def generate_new_dataset(self):
         print("generate new dataset!")

@@ -1,0 +1,93 @@
+CameraRGBBaseOptions: &CameraRGBBaseOptions
+  "image_size_x": "1600"
+  "image_size_y": "900"
+  "sensor_tick": "0.0"
+  "fstop": "1.8"
+  "shutter_speed": "20.0"
+
+sensors:
+  #-----------camera----------
+  - 
+    name: "CAM_FRONT"
+    bp_name: 'sensor.camera.rgb'
+    location: 
+      x: 1.5
+      y: 0
+      z: 2
+    rotation:
+      yaw: 0
+      pitch: 0
+      roll: 0
+    options: 
+        <<: *CameraRGBBaseOptions
+        "fov": "70"
+  - 
+    name: "CAM_FRONT_RIGHT"
+    bp_name: 'sensor.camera.rgb'
+    location: 
+      x: 1.5
+      y: 0.7
+      z: 2
+    rotation:
+      yaw: 55
+      pitch: 0
+      roll: 0
+    options: 
+        <<: *CameraRGBBaseOptions
+        "fov": "70"
+  - 
+    name: "CAM_FRONT_LEFT"
+    bp_name: 'sensor.camera.rgb'
+    location: 
+      x: 1.5
+      y: -0.7
+      z: 2
+    rotation:
+      yaw: -55
+      pitch: 0
+      roll: 0
+    options: 
+        <<: *CameraRGBBaseOptions
+        "fov": "70"
+  - 
+    name: "CAM_BACK_LEFT"
+    bp_name: 'sensor.camera.rgb'
+    location: 
+      x: -0.7
+      y: 0
+      z: 2
+    rotation:
+      yaw: -110
+      pitch: 0
+      roll: 0
+    options: 
+        <<: *CameraRGBBaseOptions
+        "fov": "70"
+  - 
+    name: "CAM_BACK"
+    bp_name: 'sensor.camera.rgb'
+    location: 
+      x: -1.5
+      y: 0
+      z: 2
+    rotation:
+      yaw: 180
+      pitch: 0
+      roll: 0
+    options: 
+        <<: *CameraRGBBaseOptions
+        "fov": "110"
+  - 
+    name: "CAM_BACK_RIGHT"
+    bp_name: 'sensor.camera.rgb'
+    location: 
+      x: -0.7
+      y: 0
+      z: 2
+    rotation:
+      yaw: 110
+      pitch: 0
+      roll: 0
+    options: 
+        <<: *CameraRGBBaseOptions
+        "fov": "70"

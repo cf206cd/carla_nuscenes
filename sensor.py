@@ -3,8 +3,9 @@ import carla
 from actor import Actor
 
 def parse_image(image):
-    array = np.frombuffer(image.raw_data, dtype=np.dtype("uint8"))
-    array = np.reshape(array, (image.height, image.width, 4))
+    array = np.ndarray(
+            shape=(image.height, image.width, 4),
+            dtype=np.uint8, buffer=image.raw_data,order="C")
     return array
 
 def parse_lidar_data(lidar_data):
@@ -55,8 +56,11 @@ class Sensor(Actor):
         self.actor.listen(self.add_data)
 
     def get_last_data(self):
-        return self.data_list[-1]
-
+        if self.data_list:
+            return self.data_list[-1]
+        else:
+            return None
+            
     def add_data(self,data):
         self.data_list.append((self.actor.parent.get_transform(),data))
 
