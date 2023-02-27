@@ -3,7 +3,7 @@ from sensor import *
 from vehicle import Vehicle
 from walker import Walker
 import math
-from utils import generate_token,get_nuscenes_rt,get_intrinsic,transform_timestamp
+from utils import generate_token,get_nuscenes_rt,get_intrinsic,transform_timestamp,clamp
 import random
 
 class Client:
@@ -335,20 +335,20 @@ class Client:
 
     def get_random_weather(self):
         weather_param = {
-            "cloudiness":max(random.random()*180-100,0),
+            "cloudiness":clamp(random.gauss(0,30)),
             "sun_azimuth_angle":random.random()*360,
             "sun_altitude_angle":random.random()*120-30,
-            "precipitation":max(random.random()*180-100,0),
-            "precipitation_deposits":max(random.random()*180-100,0),
+            "precipitation":clamp(random.gauss(0,30)),
+            "precipitation_deposits":clamp(random.gauss(0,30)),
             "wind_intensity":random.random()*100,
-            "fog_density":max(random.random()*130-100,0),
+            "fog_density":clamp(random.gauss(0,30)),
             "fog_distance":random.random()*100,
-            "wetness":max(random.random()*180-100,0),
+            "wetness":clamp(random.gauss(0,30)),
             "fog_falloff":random.random()*5,
             "scattering_intensity":max(random.random()*2-1,0),
             "mie_scattering_scale":max(random.random()*2-1,0),
-            "rayleigh_scattering_scale":max(random.random()*2-1,0),
-            "dust_storm":max(random.random()*130-100,0)
+            "rayleigh_scattering_scale":max(random.random()*2-1),
+            "dust_storm":clamp(random.gauss(0,30))
         }
         return weather_param
 
