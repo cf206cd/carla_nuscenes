@@ -61,6 +61,12 @@ class Client:
         self.ego_vehicle.blueprint.set_attribute('role_name', 'hero')
         self.ego_vehicle.spawn_actor()
         self.ego_vehicle.get_actor().set_autopilot()
+        self.trafficmanager.ignore_lights_percentage(self.ego_vehicle.get_actor(),100)
+        self.trafficmanager.ignore_signs_percentage(self.ego_vehicle.get_actor(),100)
+        self.trafficmanager.ignore_vehicles_percentage(self.ego_vehicle.get_actor(),100)
+        self.trafficmanager.distance_to_leading_vehicle(self.ego_vehicle.get_actor(),0)
+        self.trafficmanager.vehicle_percentage_speed_difference(self.ego_vehicle.get_actor(),-20)
+        self.trafficmanager.auto_lane_change(self.ego_vehicle.get_actor(), True)
 
         self.vehicles = [Vehicle(world=self.world,**vehicle_config) for vehicle_config in scene_config["vehicles"]]
         vehicles_batch = [SpawnActor(vehicle.blueprint,vehicle.transform)
@@ -129,6 +135,13 @@ class Client:
         self.ego_vehicle = Vehicle(world=self.world,bp_name=ego_bp_name,location=ego_location,rotation=ego_rotation)
         self.ego_vehicle.blueprint.set_attribute('role_name', 'hero')
         self.ego_vehicle.spawn_actor()
+        self.ego_vehicle.get_actor().set_autopilot()
+        self.trafficmanager.ignore_lights_percentage(self.ego_vehicle.get_actor(),100)
+        self.trafficmanager.ignore_signs_percentage(self.ego_vehicle.get_actor(),100)
+        self.trafficmanager.ignore_vehicles_percentage(self.ego_vehicle.get_actor(),100)
+        self.trafficmanager.distance_to_leading_vehicle(self.ego_vehicle.get_actor(),0)
+        self.trafficmanager.vehicle_percentage_speed_difference(self.ego_vehicle.get_actor(),-20)
+        self.trafficmanager.auto_lane_change(self.ego_vehicle.get_actor(), True)
 
         vehicle_bp_list = self.world.get_blueprint_library().filter("vehicle")
         self.vehicles = []
