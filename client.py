@@ -322,20 +322,20 @@ class Client:
 
     def get_random_weather(self):
         weather_param = {
-            "cloudiness":random.random()*90,
+            "cloudiness":max(random.random()*180-100,0),
             "sun_azimuth_angle":random.random()*360,
-            "sun_altitude_angle":random.random()*180-90,
-            "precipitation":random.random()*80,
-            "precipitation_deposits":random.random()*85,
+            "sun_altitude_angle":random.random()*120-30,
+            "precipitation":max(random.random()*180-100,0),
+            "precipitation_deposits":max(random.random()*180-100,0),
             "wind_intensity":random.random()*100,
-            "fog_density":random.random()*30,
+            "fog_density":max(random.random()*130-100,0),
             "fog_distance":random.random()*100,
-            "wetness":random.random()*100,
+            "wetness":max(random.random()*180-100,0),
             "fog_falloff":random.random()*5,
-            "scattering_intensity":random.random()*1,
-            "mie_scattering_scale":random.random()*1,
-            "rayleigh_scattering_scale":random.random()*1,
-            "dust_storm":random.random()*100
+            "scattering_intensity":max(random.random()*2-1,0),
+            "mie_scattering_scale":max(random.random()*2-1,0),
+            "rayleigh_scattering_scale":max(random.random()*2-1,0),
+            "dust_storm":max(random.random()*130-100,0)
         }
         return weather_param
 
