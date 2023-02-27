@@ -347,7 +347,7 @@ class Client:
             "fog_falloff":random.random()*5,
             "scattering_intensity":max(random.random()*2-1,0),
             "mie_scattering_scale":max(random.random()*2-1,0),
-            "rayleigh_scattering_scale":max(random.random()*2-1),
+            "rayleigh_scattering_scale":max(random.random()*2-1,0),
             "dust_storm":clamp(random.gauss(0,30))
         }
         return weather_param
