@@ -29,7 +29,7 @@ class Generator:
                     log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
                                             capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])
                     for scene_id,scene_config in enumerate(capture_config["scenes"]):
-                        print(self.dataset.data["current_scene_count"])
+                        print("current_scene_count:",self.dataset.data["current_scene_count"])
                         scene_token = self.add_one_scene(log_token,scene_id,scene_config)
                         self.dataset.update_scene_count()
                         self.dataset.save()
@@ -61,7 +61,7 @@ class Generator:
                     for scene_id,scene_config in enumerate(capture_config["scenes"]):
                         scene_count+=1
                         if scene_count>self.dataset.data["current_scene_count"]:
-                            print(self.dataset.data["current_scene_count"])
+                            print("current_scene_count:",self.dataset.data["current_scene_count"])
                             scene_token = self.add_one_scene(log_token,scene_id,scene_config)
                             self.dataset.update_scene_count()
                             self.dataset.save()
@@ -93,7 +93,7 @@ class Generator:
                                         capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])
                 scene_config = random.choice(capture_config["scenes"])
                 scene_config["description"] += str(scene_id)
-                print(self.dataset.data["current_scene_count"])
+                print("current_scene_count:",self.dataset.data["current_scene_count"])
                 scene_token = self.add_one_scene(log_token,scene_id,scene_config)
                 self.dataset.update_scene_count()
                 self.dataset.save()
@@ -124,7 +124,7 @@ class Generator:
                                         capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])
                 scene_config = random.choice(capture_config["scenes"])
                 scene_config["description"] += str(scene_id)
-                print(self.dataset.data["current_scene_count"])
+                print("current_scene_count:",self.dataset.data["current_scene_count"])
                 scene_token = self.add_one_scene(log_token,scene_id,scene_config)
                 self.dataset.update_scene_count()
                 self.dataset.save()
