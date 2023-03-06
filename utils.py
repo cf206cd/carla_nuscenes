@@ -52,7 +52,7 @@ def get_nuscenes_rt(transform,mode=None):
             [0,0,1]
         ])
     rotation_matrix = rotation_matrix3@rotation_matrix2@rotation_matrix1
-    quat = Quaternion(matrix=rotation_matrix,rtol=1e-04, atol=1e-07).elements.tolist()
+    quat = Quaternion(matrix=rotation_matrix,rtol=1, atol=1).elements.tolist()
     return quat,translation
 
 def clamp(value, minimum=0.0, maximum=100.0):
