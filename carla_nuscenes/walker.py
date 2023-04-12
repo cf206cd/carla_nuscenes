@@ -1,4 +1,4 @@
-from actor import Actor
+from .actor import Actor
 import carla
 class Walker(Actor):
     def __init__(self,destination=None,**args):

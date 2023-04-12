@@ -19,8 +19,6 @@ attributes:
 visibility:
   !include ./configs/visibility.yaml 
 
-scene_count: 1000
-
 worlds:  #map
   - 
     map_name: "Town03"
@@ -36,6 +34,7 @@ worlds:  #map
         location: "chengdu"
         scenes:
           - 
+            count: 1000
             custom: False
             collect_time: 20
             keyframe_time: 0.5

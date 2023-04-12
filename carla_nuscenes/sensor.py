@@ -1,6 +1,6 @@
 import numpy as np
 import carla
-from actor import Actor
+from .actor import Actor
 
 def parse_image(image):
     array = np.ndarray(

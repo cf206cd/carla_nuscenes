@@ -1,7 +1,7 @@
 import os
-from utils import load,dump,generate_token
+from .utils import load,dump,generate_token
 import carla
-from sensor import parse_lidar_data,parse_radar_data
+from .sensor import parse_lidar_data,parse_radar_data
 
 def save_image(image,path):
     image.save_to_disk(path)
@@ -51,7 +51,11 @@ class Dataset:
             "scene":[],
             "sensor":[],
             "visibility":[],
-            "current_scene_count":0
+            "progress":{"current_world_index":0,
+                        "current_capture_index":0,
+                        "current_scene_index":0,
+                        "current_scene_count":0
+                        }
         }
         if load:
             self.load()
@@ -302,5 +306,14 @@ class Dataset:
         filename = os.path.join(dir,channel,name)
         return filename
 
-    def update_scene_count(self):
-        self.data["current_scene_count"]+=1
+    def update_world_index(self,index):
+        self.data["progress"]["current_world_index"]=index
+
+    def update_capture_index(self,index):
+        self.data["progress"]["current_capture_index"]=index
+
+    def update_scene_index(self,index):
+        self.data["progress"]["current_scene_index"]=index
+
+    def update_scene_count(self,count):
+        self.data["progress"]["current_scene_count"]=count

@@ -1,9 +1,9 @@
 import carla
-from sensor import *
-from vehicle import Vehicle
-from walker import Walker
+from .sensor import *
+from .vehicle import Vehicle
+from .walker import Walker
 import math
-from utils import generate_token,get_nuscenes_rt,get_intrinsic,transform_timestamp,clamp
+from .utils import generate_token,get_nuscenes_rt,get_intrinsic,transform_timestamp,clamp
 import random
 
 class Client:

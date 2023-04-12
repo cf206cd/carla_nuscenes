@@ -1,4 +1,4 @@
-from actor import Actor
+from .actor import Actor
 import carla
 class Vehicle(Actor):
     def __init__(self,path=[],**args):

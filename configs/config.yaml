@@ -34,6 +34,7 @@ worlds:  #map
         location: "chengdu"
         scenes:
           - 
+            count: 1
             custom: True
             collect_time: 1
             keyframe_time: 0.5
@@ -78,6 +79,7 @@ worlds:  #map
             description:
               "test1"
           - 
+            count: 1
             custom: True
             collect_time: 1
             keyframe_time: 0.5
@@ -121,3 +123,13 @@ worlds:  #map
               !include ./configs/calibrated_sensors.yaml
             description:
               "test2"
+          - 
+            count: 1000
+            custom: False
+            collect_time: 20
+            keyframe_time: 0.5
+            ego_bp_name: "vehicle.tesla.model3"
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "test"
