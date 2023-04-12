@@ -1,0 +1,254 @@
+dataset:
+  root: "/media/data20T/carla_v1_6"
+  version: "v1.16"
+
+client:
+  host: 127.0.0.1
+  port: 2000
+  time_out: 10.0
+
+sensors:
+  !include ./configs/sensors.yaml
+
+categories:
+  !include ./configs/categories.yaml
+
+attributes:
+  !include ./configs/attributes.yaml
+
+visibility:
+  !include ./configs/visibility.yaml 
+
+scene_count: 1000
+
+worlds:  #map
+  - 
+    map_name: "Town01_Opt"
+    map_category: "semantic_prior"
+    settings:
+      fixed_delta_seconds: 0.01
+    captures: #log
+      - 
+        date: "2023-01-01"
+        time: "10-45-20"
+        timezone: "+0800"
+        capture_vehicle: "c0003"
+        location: "chengdu"
+        scenes:
+          - 
+            custom: False
+            collect_time: 20
+            keyframe_time: 0.5
+            ego_bp_name: "vehicle.tesla.model3"
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "A small, simple town with a river and several bridges."
+  - 
+    map_name: "Town02_Opt"
+    map_category: "semantic_prior"
+    settings:
+      fixed_delta_seconds: 0.01
+    captures: #log
+      - 
+        date: "2023-01-02"
+        time: "10-45-20"
+        timezone: "+0800"
+        capture_vehicle: "c0003"
+        location: "chengdu"
+        scenes:
+          - 
+            count: 100
+            custom: False
+            collect_time: 20
+            keyframe_time: 0.5
+            ego_bp_name: "vehicle.tesla.model3"
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "A small simple town with a mixture of residential and commercial buildings."
+  - 
+    map_name: "Town03_Opt"
+    map_category: "semantic_prior"
+    settings:
+      fixed_delta_seconds: 0.01
+    captures: #log
+      - 
+        date: "2023-01-03"
+        time: "10-45-20"
+        timezone: "+0800"
+        capture_vehicle: "c0003"
+        location: "chengdu"
+        scenes:
+          - 
+            count: 100
+            custom: False
+            collect_time: 20
+            keyframe_time: 0.5
+            ego_bp_name: "vehicle.tesla.model3"
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "A larger, urban map with a roundabout and large junctions."
+  - 
+    map_name: "Town04_Opt"
+    map_category: "semantic_prior"
+    settings:
+      fixed_delta_seconds: 0.01
+    captures: #log
+      - 
+        date: "2023-01-04"
+        time: "10-45-20"
+        timezone: "+0800"
+        capture_vehicle: "c0003"
+        location: "chengdu"
+        scenes:
+          - 
+            count: 100
+            custom: False
+            collect_time: 20
+            keyframe_time: 0.5
+            ego_bp_name: "vehicle.tesla.model3"
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "A small town embedded in the mountains with a special figure of 8 infinite highway."
+  - 
+    map_name: "Town05_Opt"
+    map_category: "semantic_prior"
+    settings:
+      fixed_delta_seconds: 0.01
+    captures: #log
+      - 
+        date: "2023-01-05"
+        time: "10-45-20"
+        timezone: "+0800"
+        capture_vehicle: "c0003"
+        location: "chengdu"
+        scenes:
+          - 
+            count: 100
+            custom: False
+            collect_time: 20
+            keyframe_time: 0.5
+            ego_bp_name: "vehicle.tesla.model3"
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "Squared-grid town with cross junctions and a bridge. It has multiple lanes per direction. Useful to perform lane changes."
+  - 
+    map_name: "Town06_Opt"
+    map_category: "semantic_prior"
+    settings:
+      fixed_delta_seconds: 0.01
+    captures: #log
+      - 
+        date: "2023-01-06"
+        time: "10-45-20"
+        timezone: "+0800"
+        capture_vehicle: "c0003"
+        location: "chengdu"
+        scenes:
+          - 
+            count: 100
+            custom: False
+            collect_time: 20
+            keyframe_time: 0.5
+            ego_bp_name: "vehicle.tesla.model3"
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "Long many lane highways with many highway entrances and exits. It also has a Michigan left."
+  - 
+    map_name: "Town07"
+    map_category: "semantic_prior"
+    settings:
+      fixed_delta_seconds: 0.01
+    captures: #log
+      - 
+        date: "2023-01-07"
+        time: "10-45-20"
+        timezone: "+0800"
+        capture_vehicle: "c0003"
+        location: "chengdu"
+        scenes:
+          - 
+            count: 100
+            custom: False
+            collect_time: 20
+            keyframe_time: 0.5
+            ego_bp_name: "vehicle.tesla.model3"
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "A rural environment with narrow roads, corn, barns and hardly any traffic lights."
+  - 
+    map_name: "Town10HD_Opt"
+    map_category: "semantic_prior"
+    settings:
+      fixed_delta_seconds: 0.01
+    captures: #log
+      - 
+        date: "2023-01-10"
+        time: "10-45-20"
+        timezone: "+0800"
+        capture_vehicle: "c0003"
+        location: "chengdu"
+        scenes:
+          - 
+            count: 100
+            custom: False
+            collect_time: 20
+            keyframe_time: 0.5
+            ego_bp_name: "vehicle.tesla.model3"
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "A downtown urban environment with skyscrapers, residential buildings and an ocean promenade."
+  - 
+    map_name: "Town11"
+    map_category: "semantic_prior"
+    settings:
+      fixed_delta_seconds: 0.01
+    captures: #log
+      - 
+        date: "2023-01-11"
+        time: "10-45-20"
+        timezone: "+0800"
+        capture_vehicle: "c0003"
+        location: "chengdu"
+        scenes:
+          - 
+            count: 100
+            custom: False
+            collect_time: 20
+            keyframe_time: 0.5
+            ego_bp_name: "vehicle.tesla.model3"
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "A Large Map that is undecorated. Serves as a proof of concept for the Large Maps feature."
+
+  - 
+    map_name: "Town12"
+    map_category: "semantic_prior"
+    settings:
+      fixed_delta_seconds: 0.01
+    captures: #log
+      - 
+        date: "2023-01-12"
+        time: "10-45-20"
+        timezone: "+0800"
+        capture_vehicle: "c0003"
+        location: "chengdu"
+        scenes:
+          - 
+            count: 100
+            custom: False
+            collect_time: 20
+            keyframe_time: 0.5
+            ego_bp_name: "vehicle.tesla.model3"
+            calibrated_sensors:
+              !include ./configs/calibrated_sensors.yaml
+            description:
+              "A Large Map with numerous different regions, including high-rise, residential and rural environments."
