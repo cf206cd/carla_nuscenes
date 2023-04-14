@@ -9,6 +9,7 @@ class Generator:
 
     def generate_dataset(self,load=False):
         self.dataset = Dataset(**self.config["dataset"],load=load)
+        self.dataset.save()
         print(self.dataset.data["progress"])
         for sensor in self.config["sensors"]:
             self.dataset.update_sensor(sensor["name"],sensor["modality"])
