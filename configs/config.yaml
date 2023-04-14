@@ -124,7 +124,7 @@ worlds:  #map
             description:
               "test2"
           - 
-            count: 1000
+            count: 5
             custom: False
             collect_time: 20
             keyframe_time: 0.5

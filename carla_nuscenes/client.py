@@ -255,13 +255,13 @@ class Client:
     def get_sample(self):
         return (transform_timestamp(self.world.get_snapshot().timestamp.elapsed_seconds),)
 
-    def get_instance(self,scene_id,instance):
+    def get_instance(self,scene_token,instance):
         category_token = generate_token("category",self.category_dict[instance.blueprint.id])
-        id = hash((scene_id,instance.get_actor().id))
+        id = hash((scene_token,instance.get_actor().id))
         return category_token,id
 
-    def get_sample_annotation(self,scene_id,instance):
-        instance_token = generate_token("instance",hash((scene_id,instance.get_actor().id)))
+    def get_sample_annotation(self,scene_token,instance):
+        instance_token = generate_token("instance",hash((scene_token,instance.get_actor().id)))
         visibility_token = str(self.get_visibility(instance))
         
         attribute_tokens = [generate_token("attribute",attribute) for attribute in self.get_attributes(instance)]

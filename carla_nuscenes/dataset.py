@@ -31,12 +31,11 @@ class Dataset:
         self.root = root
         self.version = version
         self.json_dir = os.path.join(root,version)
-        mkdir(root)
+        mkdir(self.root)
         mkdir(self.json_dir)
-        mkdir(os.path.join(root,"maps"))
-        mkdir(os.path.join(root,"samples"))
-        mkdir(os.path.join(root,"sweeps"))
-
+        mkdir(os.path.join(self.root,"maps"))
+        mkdir(os.path.join(self.root,"samples"))
+        mkdir(os.path.join(self.root,"sweeps"))
         self.data = {
             "attribute":[],
             "calibrated_sensor":[],
@@ -118,6 +117,18 @@ class Dataset:
         mkdir(os.path.join(self.root,"samples",channel))
         mkdir(os.path.join(self.root,"sweeps",channel))
         return sensor_item["token"]
+    
+    def update_world_index(self):
+        self.data["progress"]["current_world_index"] += 1    
+
+    def update_capture_index(self):
+        self.data["progress"]["current_capture_index"] += 1
+
+    def update_scene_index(self):
+        self.data["progress"]["current_scene_index"] += 1
+
+    def update_scene_count(self):
+        self.data["progress"]["current_scene_count"] += 1
 
     def update_calibrated_sensor(self,scene_token,sensor_token,channel,translation,rotation,intrinsic,replace=True):
         calibrated_sensor_item = {}
@@ -133,9 +144,9 @@ class Dataset:
             self.data["calibrated_sensor"].append(calibrated_sensor_item)
         return calibrated_sensor_item["token"]
 
-    def update_scene(self,log_token,id,description,replace=True):
+    def update_scene(self,log_token,description,replace=True):
         scene_item = {}
-        scene_item["name"] = "scene-"+str(id)
+        scene_item["name"] = "scene-"+str(self.data["progress"]["current_scene_index"])+"-"+str(self.data["progress"]["current_scene_count"])
         scene_item["token"] = generate_token("scene",log_token+scene_item["name"])
         scene_item["description"] = description
         scene_item["log_token"] = log_token
@@ -305,15 +316,3 @@ class Dataset:
         name = log_file+"_"+channel+"_"+str(sample_data_item["timestamp"])+"."+sample_data_item["fileformat"]
         filename = os.path.join(dir,channel,name)
         return filename
-
-    def update_world_index(self,index):
-        self.data["progress"]["current_world_index"]=index
-
-    def update_capture_index(self,index):
-        self.data["progress"]["current_capture_index"]=index
-
-    def update_scene_index(self,index):
-        self.data["progress"]["current_scene_index"]=index
-
-    def update_scene_count(self,count):
-        self.data["progress"]["current_scene_count"]=count

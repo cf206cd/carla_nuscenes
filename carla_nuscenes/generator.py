@@ -10,7 +10,6 @@ class Generator:
     def generate_dataset(self,load=False):
         self.dataset = Dataset(**self.config["dataset"],load=load)
         print(self.dataset.data["progress"])
-        self.dataset.save()
         for sensor in self.config["sensors"]:
             self.dataset.update_sensor(sensor["name"],sensor["modality"])
         for category in self.config["categories"]:
@@ -20,30 +19,27 @@ class Generator:
         for visibility in self.config["visibility"]:
             self.dataset.update_visibility(visibility["description"],visibility["level"])
 
-        for world_idx in range(self.dataset.data["progress"]["current_world_index"],len(self.config["worlds"])):
-            world_config = self.config["worlds"][world_idx]
-            self.dataset.update_world_index(world_idx)
+        for world_config in self.config["worlds"][self.dataset.data["progress"]["current_world_index"]:]:
             try:
                 self.collect_client.generate_world(world_config)
                 map_token = self.dataset.update_map(world_config["map_name"],world_config["map_category"])
-                for capture_idx in range(self.dataset.data["progress"]["current_capture_index"],len(world_config["captures"])):
-                    capture_config = world_config["captures"][capture_idx]
-                    self.dataset.update_capture_index(world_idx)
+                for capture_config in world_config["captures"][self.dataset.data["progress"]["current_capture_index"]:]:
                     log_token = self.dataset.update_log(map_token,capture_config["date"],capture_config["time"],
                                             capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])
-                    for scene_idx in range(self.dataset.data["progress"]["current_scene_index"],len(capture_config["scenes"])):
-                        scene_config = capture_config["scenes"][scene_idx]
-                        self.dataset.update_scene_index(scene_idx)
-                        for scene_count in range(self.dataset.data["progress"]["current_scene_index"],scene_config["count"]):
-                            self.dataset.update_scene_count(scene_count)
-                            scene_token = self.add_one_scene(log_token,scene_idx,scene_config)
-                            self.dataset.save()
+                    for scene_config in capture_config["scenes"][self.dataset.data["progress"]["current_scene_index"]:]:
+                        for scene_count in range(self.dataset.data["progress"]["current_scene_count"],scene_config["count"]):
+                            self.add_one_scene(log_token,scene_config)
+                            self.dataset.update_scene_count()
+                        self.dataset.update_scene_index()
+                    self.dataset.update_capture_index()
+                self.dataset.update_world_index()
+                self.dataset.save()
             except:
                 traceback.print_exc()
             finally:
                 self.collect_client.destroy_world()
-
-    def add_one_scene(self,log_token,scene_id,scene_config):
+                
+    def add_one_scene(self,log_token,scene_config):
         try:
             calibrated_sensors_token = {}
             samples_data_token = {}
@@ -51,10 +47,10 @@ class Generator:
             samples_annotation_token = {}
 
             self.collect_client.generate_scene(scene_config)
-            scene_token = self.dataset.update_scene(log_token,scene_id,scene_config["description"])
+            scene_token = self.dataset.update_scene(log_token,scene_config["description"])
 
             for instance in self.collect_client.walkers+self.collect_client.vehicles:
-                instance_token = self.dataset.update_instance(*self.collect_client.get_instance(scene_id,instance))
+                instance_token = self.dataset.update_instance(*self.collect_client.get_instance(scene_token,instance))
                 instances_token[instance.get_actor().id] = instance_token
                 samples_annotation_token[instance.get_actor().id] = ""
             
@@ -80,7 +76,7 @@ class Generator:
 
                     for instance in self.collect_client.walkers+self.collect_client.vehicles:
                         if self.collect_client.get_visibility(instance) > 0:
-                            samples_annotation_token[instance.get_actor().id]  = self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_id,instance))
+                            samples_annotation_token[instance.get_actor().id]  = self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_token,instance))
                     
                     for sensor in self.collect_client.sensors:
                         sensor.get_data_list().clear()
