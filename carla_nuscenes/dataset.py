@@ -119,13 +119,16 @@ class Dataset:
         return sensor_item["token"]
     
     def update_world_index(self):
-        self.data["progress"]["current_world_index"] += 1    
+        self.data["progress"]["current_world_index"] += 1   
+        self.data["progress"]["current_capture_index"] = 0
 
     def update_capture_index(self):
         self.data["progress"]["current_capture_index"] += 1
+        self.data["progress"]["current_scene_index"] = 0
 
     def update_scene_index(self):
         self.data["progress"]["current_scene_index"] += 1
+        self.data["progress"]["current_scene_count"] = 0
 
     def update_scene_count(self):
         self.data["progress"]["current_scene_count"] += 1
