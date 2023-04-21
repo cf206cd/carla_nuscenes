@@ -58,9 +58,7 @@ class Generator:
             for sensor in self.collect_client.sensors:
                 calibrated_sensor_token = self.dataset.update_calibrated_sensor(scene_token,*self.collect_client.get_calibrated_sensor(sensor))
                 calibrated_sensors_token[sensor.name] = calibrated_sensor_token
-                samples_data_token[sensor.name] = ""
 
-            sample_token = ""
             for frame_count in range(int(scene_config["collect_time"]/self.collect_client.settings.fixed_delta_seconds)):
                 print("frame count:",frame_count)
                 self.collect_client.tick()
@@ -78,8 +76,9 @@ class Generator:
                     for instance in self.collect_client.walkers+self.collect_client.vehicles:
                         if self.collect_client.get_visibility(instance) > 0:
                             samples_annotation_token[instance.get_actor().id]  = self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_token,instance))
-                    
                     for sensor in self.collect_client.sensors:
                         sensor.get_data_list().clear()
+        except:
+            traceback.print_exc()
         finally:
             self.collect_client.destroy_scene()
