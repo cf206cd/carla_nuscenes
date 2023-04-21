@@ -12,7 +12,7 @@ def generate_token(key,data):
     result = obj.hexdigest()
     return result
 
-async def dump(data,path):
+def dump(data,path):
     with open(path, "w") as filedata:
         json.dump(data, filedata, indent=0, separators=(',',':'))
 

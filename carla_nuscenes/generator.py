@@ -1,7 +1,6 @@
 from .client import Client
 from .dataset import Dataset
 import traceback
-import asyncio
 
 class Generator:
     def __init__(self,config):
@@ -10,7 +9,7 @@ class Generator:
 
     def generate_dataset(self,load=False):
         self.dataset = Dataset(**self.config["dataset"],load=load)
-        self.dataset.save()
+        
         print(self.dataset.data["progress"])
         for sensor in self.config["sensors"]:
             self.dataset.update_sensor(sensor["name"],sensor["modality"])
@@ -30,8 +29,8 @@ class Generator:
                                             capture_config["timezone"],capture_config["capture_vehicle"],capture_config["location"])
                     for scene_config in capture_config["scenes"][self.dataset.data["progress"]["current_scene_index"]:]:
                         for scene_count in range(self.dataset.data["progress"]["current_scene_count"],scene_config["count"]):
-                            self.add_one_scene(log_token,scene_config)
                             self.dataset.update_scene_count()
+                            self.add_one_scene(log_token,scene_config)
                             self.dataset.save()
                         self.dataset.update_scene_index()
                     self.dataset.update_capture_index()
