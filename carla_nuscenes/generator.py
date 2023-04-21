@@ -31,10 +31,10 @@ class Generator:
                         for scene_count in range(self.dataset.data["progress"]["current_scene_count"],scene_config["count"]):
                             self.add_one_scene(log_token,scene_config)
                             self.dataset.update_scene_count()
+                            self.dataset.save()
                         self.dataset.update_scene_index()
                     self.dataset.update_capture_index()
                 self.dataset.update_world_index()
-                self.dataset.save()
             except:
                 traceback.print_exc()
             finally:
