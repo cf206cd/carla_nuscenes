@@ -58,7 +58,9 @@ class Generator:
             for sensor in self.collect_client.sensors:
                 calibrated_sensor_token = self.dataset.update_calibrated_sensor(scene_token,*self.collect_client.get_calibrated_sensor(sensor))
                 calibrated_sensors_token[sensor.name] = calibrated_sensor_token
+                samples_data_token[sensor.name] = ""
 
+            sample_token = ""
             for frame_count in range(int(scene_config["collect_time"]/self.collect_client.settings.fixed_delta_seconds)):
                 print("frame count:",frame_count)
                 self.collect_client.tick()
