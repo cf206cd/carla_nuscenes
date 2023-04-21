@@ -21,8 +21,7 @@ def parse_lidar_data(lidar_data):
     return np.array(points)
 
 def parse_radar_data(radar_data):
-    points = np.frombuffer(radar_data.raw_data, dtype=np.dtype('f4'))
-    points = points.copy()
+    points = np.frombuffer(radar_data.raw_data, dtype=np.dtype('f4')).copy()
     return points
 
 def parse_data(data):

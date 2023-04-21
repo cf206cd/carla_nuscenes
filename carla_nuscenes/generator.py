@@ -1,6 +1,7 @@
 from .client import Client
 from .dataset import Dataset
 import traceback
+import asyncio
 
 class Generator:
     def __init__(self,config):
@@ -78,6 +79,7 @@ class Generator:
                     for instance in self.collect_client.walkers+self.collect_client.vehicles:
                         if self.collect_client.get_visibility(instance) > 0:
                             samples_annotation_token[instance.get_actor().id]  = self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_token,instance))
+                    self.dataset.save_sensor_data()
                     for sensor in self.collect_client.sensors:
                         sensor.get_data_list().clear()
         except:

@@ -2,6 +2,7 @@ import os
 from .utils import load,dump,generate_token
 import carla
 from .sensor import parse_lidar_data,parse_radar_data
+import asyncio
 
 def save_image(image,path):
     image.save_to_disk(path)
@@ -14,13 +15,14 @@ def save_radar_data(radar_data,path):
     points = parse_radar_data(radar_data)
     points.tofile(path)
 
-def save_data(data,path):
+async def save_sensor_data(data,path):
     if isinstance(data,carla.Image):
         save_image(data,path)
     elif isinstance(data,carla.RadarMeasurement):
         save_radar_data(data,path)
     elif isinstance(data,carla.LidarMeasurement):
         save_lidar_data(data,path)   
+    print(path)
 
 def mkdir(path):
     if not os.path.exists(path):
@@ -36,6 +38,7 @@ class Dataset:
         mkdir(os.path.join(self.root,"maps"))
         mkdir(os.path.join(self.root,"samples"))
         mkdir(os.path.join(self.root,"sweeps"))
+        self.save_sensor_data_tasks = []
         self.data = {
             "attribute":[],
             "calibrated_sensor":[],
@@ -64,10 +67,23 @@ class Dataset:
             json_path = os.path.join(self.json_dir,key+".json")
             self.data[key] = load(json_path)
 
-    def save(self):
+    async def async_save(self):
+        tasks = []
         for key in self.data:
             json_path = os.path.join(self.json_dir,key+".json")
-            dump(self.data[key],json_path)
+            tasks.append(dump(self.data[key],json_path))
+            print(json_path)
+        await asyncio.wait(tasks)
+
+    def save(self):
+        asyncio.run(self.async_save())
+
+    async def async_save_sensor_data(self):
+        await asyncio.wait(self.save_sensor_data_tasks)
+
+    def save_sensor_data(self):
+        asyncio.run(self.async_save_sensor_data())
+        self.save_sensor_data_tasks.clear()
 
     def get_item(self,key,token):
         for item in self.data[key]:
@@ -204,8 +220,7 @@ class Dataset:
         sample_data_item["prev"] = prev
         sample_data_item["next"] = ""
         filename = self.get_filename(sample_data_item)
-        print("save file:",filename)
-        save_data(sample_data[1],os.path.join(self.root,filename))
+        self.save_sensor_data_tasks.append(save_sensor_data(sample_data[1],os.path.join(self.root,filename)))
         sample_data_item["filename"] = filename
         if prev != "":
             self.get_item("sample_data",prev)["next"] = ego_pose_token
