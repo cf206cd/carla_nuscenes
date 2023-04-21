@@ -37,7 +37,6 @@ class Dataset:
         mkdir(os.path.join(self.root,"maps"))
         mkdir(os.path.join(self.root,"samples"))
         mkdir(os.path.join(self.root,"sweeps"))
-        self.sensor_data = []
         self.data = {
             "attribute":[],
             "calibrated_sensor":[],
@@ -74,11 +73,6 @@ class Dataset:
             json_path = os.path.join(self.json_dir,key+".json")
             dump(self.data[key],json_path)
             print(json_path)
-
-    def save_sensor_data(self):
-        for data,path in self.sensor_data:
-            save_sensor_data(data,path)
-            print(path)
 
     def get_item(self,key,token):
         for item in self.data[key]:
@@ -215,7 +209,8 @@ class Dataset:
         sample_data_item["prev"] = prev
         sample_data_item["next"] = ""
         filename = self.get_filename(sample_data_item)
-        self.sensor_data.append((sample_data[1],os.path.join(self.root,filename)))
+        save_sensor_data(sample_data[1],os.path.join(self.root,filename))
+        print(filename)
         sample_data_item["filename"] = filename
         if prev != "":
             self.get_item("sample_data",prev)["next"] = ego_pose_token

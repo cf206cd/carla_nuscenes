@@ -9,7 +9,6 @@ class Generator:
 
     def generate_dataset(self,load=False):
         self.dataset = Dataset(**self.config["dataset"],load=load)
-        
         print(self.dataset.data["progress"])
         for sensor in self.config["sensors"]:
             self.dataset.update_sensor(sensor["name"],sensor["modality"])
@@ -78,7 +77,6 @@ class Generator:
                     for instance in self.collect_client.walkers+self.collect_client.vehicles:
                         if self.collect_client.get_visibility(instance) > 0:
                             samples_annotation_token[instance.get_actor().id]  = self.dataset.update_sample_annotation(samples_annotation_token[instance.get_actor().id],sample_token,*self.collect_client.get_sample_annotation(scene_token,instance))
-                    self.dataset.save_sensor_data()
                     for sensor in self.collect_client.sensors:
                         sensor.get_data_list().clear()
         except:
